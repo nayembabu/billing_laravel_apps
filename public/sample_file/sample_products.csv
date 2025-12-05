@@ -1,0 +1,3 @@
+image,name,code,type,brand,category,unit_code,cost,price,product_details,variant_name,item_code,additional_price,pack_size,expired_at,net_weight,gross_weight
+,tinko,9999,standard,Lotto,accessories,pc,15,20,this is test product with variant,"S,M,L","S-9999,M-9999,L-9999","0,0,10",12,03/21/2025,1,1.5
+,test,1111,standard,,food,kg,10,15,this is test product without variant,,,,6,03/21/2025,2,2
