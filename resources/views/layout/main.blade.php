@@ -331,11 +331,14 @@
                 </li>
             @endif
             <?php
-            $index_permission_active = DB::table('permissions')
+            /*
+                $index_permission_active = DB::table('permissions')
                 ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
                 ->where([['permissions.name', 'quotes-index'], ['role_id', $role->id]])
                 ->first();
+            */
             ?>
+            <!-- 
             @if ($index_permission_active)
                 <li><a href="#quotation" aria-expanded="false" data-toggle="collapse"> <i
                             class="dripicons-document"></i><span>{{ trans('file.Quotation') }}</span><span></a>
@@ -356,6 +359,7 @@
                     </ul>
                 </li>
             @endif
+            -->
             <?php
             $index_permission_active = DB::table('permissions')
                 ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
