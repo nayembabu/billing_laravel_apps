@@ -217,7 +217,10 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('report/product_report', 'ReportController@productReport')->name('report.product');
 	Route::post('report/product_report_data', 'ReportController@productReportData');
 	Route::post('report/purchase', 'ReportController@purchaseReport')->name('report.purchase');
+
 	Route::post('report/sale_report', 'ReportController@saleReport')->name('report.sale');
+	Route::get('report/sale_report', 'ReportController@saleReport')->name('report.sale');
+
 	Route::post('report/sale-report-chart', 'ReportController@saleReportChart')->name('report.saleChart');
 	Route::post('report/payment_report_by_date', 'ReportController@paymentReportByDate')->name('report.paymentByDate');
 	Route::post('report/warehouse_report', 'ReportController@warehouseReport')->name('report.warehouse');

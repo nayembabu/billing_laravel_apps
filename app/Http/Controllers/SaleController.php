@@ -133,7 +133,7 @@ class SaleController extends Controller
         $order = 'sales.' . $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
         if (empty($request->input('search.value'))) {
-            $q = Sale::with('biller', 'customer', 'warehouse', 'user')
+            $q = Sale::with('biller', 'customer', 'warehouse', 'user', 'returns')
                 ->whereDate('created_at', '>=', $request->input('starting_date'))
                 ->whereDate('created_at', '<=', $request->input('ending_date'))
                 ->offset($start)
@@ -157,7 +157,7 @@ class SaleController extends Controller
                 ->limit($limit)
                 ->orderBy($order, $dir);
             if (Auth::user()->role_id > 2 && config('staff_access') == 'own') {
-                $sales =  $q->select('sales.*')
+                $sales =  $q->select('sales.*, returns.*')
                     ->with('biller', 'customer', 'warehouse', 'user')
                     ->where('sales.user_id', Auth::id())
                     ->orwhere([
@@ -196,7 +196,7 @@ class SaleController extends Controller
                     ])
                     ->count();
             } else {
-                $sales =  $q->select('sales.*')
+                $sales =  $q->select('sales.*, returns.*')
                     ->with('biller', 'customer', 'warehouse', 'user')
                     ->orwhere('sales.reference_no', 'LIKE', "%{$search}%")
                     ->orwhere('customers.name', 'LIKE', "%{$search}%")
@@ -212,7 +212,6 @@ class SaleController extends Controller
             }
         }
         $data = array();
-
 
         if(!empty($sales))
         {
@@ -233,16 +232,30 @@ class SaleController extends Controller
                 $nestedData['customer'] = $sale->customer->name . '<input type="hidden" class="deposit" value="' . ($sale->customer->deposit - $sale->customer->expense) . '" />' . '<input type="hidden" class="points" value="' . $sale->customer->points . '" />';
                 $nestedData['customer'] = $sale->customer->name.'<input type="hidden" class="deposit" value="'.($sale->customer->deposit - $sale->customer->expense).'" />'.'<input type="hidden" class="points" value="'.$sale->customer->points.'" />';
 
+                $has_return = $sale->returns && $sale->returns->count() > 0;
 
-                if ($sale->sale_status == 1) {
-                    $nestedData['sale_status'] = '<div class="badge badge-success">' . trans('file.Completed') . '</div>';
-                    $sale_status = trans('file.Completed');
-                } elseif ($sale->sale_status == 2) {
-                    $nestedData['sale_status'] = '<div class="badge badge-danger">' . trans('file.Pending') . '</div>';
-                    $sale_status = trans('file.Pending');
-                } else {
-                    $nestedData['sale_status'] = '<div class="badge badge-warning">' . trans('file.Draft') . '</div>';
-                    $sale_status = trans('file.Draft');
+                if ($has_return) {
+                    if ($sale->sale_status == 1) {
+                        $nestedData['sale_status'] = '<div class="badge badge-success">' . trans('file.Completed') . '</div> <div class="badge badge-warning text-white ">' . trans('file.Return') . '</div>';
+                        $sale_status = trans('file.Completed');
+                    } elseif ($sale->sale_status == 2) {
+                        $nestedData['sale_status'] = '<div class="badge badge-danger">' . trans('file.Pending') . '</div><div class="badge badge-warning text-white ">' . trans('file.Return') . '</div>';
+                        $sale_status = trans('file.Pending');
+                    } else {
+                        $nestedData['sale_status'] = '<div class="badge badge-warning">' . trans('file.Draft') . '</div><div class="badge badge-warning text-white ">' . trans('file.Return') . '</div>';
+                        $sale_status = trans('file.Draft');
+                    }
+                }else if(!$has_return){
+                    if ($sale->sale_status == 1) {
+                        $nestedData['sale_status'] = '<div class="badge badge-success">' . trans('file.Completed') . '</div>';
+                        $sale_status = trans('file.Completed');
+                    } elseif ($sale->sale_status == 2) {
+                        $nestedData['sale_status'] = '<div class="badge badge-danger">' . trans('file.Pending') . '</div>';
+                        $sale_status = trans('file.Pending');
+                    } else {
+                        $nestedData['sale_status'] = '<div class="badge badge-warning">' . trans('file.Draft') . '</div>';
+                        $sale_status = trans('file.Draft');
+                    }
                 }
 
                 if ($sale->payment_status == 1)
@@ -257,7 +270,7 @@ class SaleController extends Controller
                 $nestedData['grand_total'] =  number_format($sale->grand_total, 2);
 
                 $nestedData['paid_amount'] = number_format($sale->paid_amount, 2);
-                $nestedData['due'] = number_format($sale->grand_total - $sale->paid_amount, 2);
+                $nestedData['due'] = number_format($sale->grand_total - ($sale->paid_amount + $sale->returns->sum('total_price')), 2);
                 $nestedData['options'] = '<div class="btn-group">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . trans("file.action") . '
                               <span class="caret"></span>
@@ -360,7 +373,7 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-      
+
         if (isset($request->reference_no)) {
             $this->validate($request, [
                 'reference_no' => [
@@ -595,11 +608,10 @@ class SaleController extends Controller
             else
                 $mail_data['unit'][$i] = '';
 
-           
             $product_sale['sale_id'] = $lims_sale_data->id;
             $product_sale['product_id'] = $id;
             $product_sale['imei_number'] = $imei_number[$i];
-            
+
             $product_sale['qty'] = $mail_data['qty'][$i] = $qty[$i];
             $product_sale['sale_unit_id'] = $sale_unit_id;
             $product_sale['net_unit_price'] = $net_unit_price[$i];
@@ -1321,7 +1333,7 @@ class SaleController extends Controller
         $product[] = $lims_product_data->is_batch;
         $product[] = $lims_product_data->is_imei;
         $product[] = $lims_product_data->is_variant;
-      
+
         $product[] = $qty;
         $product[] = $lims_product_data->net_weight;
         $product[] = $lims_product_data->gross_weight;

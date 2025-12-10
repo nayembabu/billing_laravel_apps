@@ -35,13 +35,23 @@
             </thead>
             <tbody>
                 @foreach($lims_customer_all as $key => $customer)
-                <?php 
+                <?php
                     $saleData = App\Sale::where([
                                     ['customer_id', $customer->id],
                                     ['payment_status', '!=', 4]
                                 ])
                                 ->selectRaw('SUM(grand_total) as grand_total,SUM(paid_amount) as paid_amount')
                                 ->first();
+
+                    $returnData = App\Returns::whereHas('sale', function($q) use ($customer) {
+                            $q->where([
+                                    ['customer_id', $customer->id],
+                                    ['payment_status', '!=', 4]
+                                ]);
+                        })
+                        ->selectRaw('SUM(total_price) as returned_total')
+                        ->first();
+
                 ?>
                 <tr data-id="{{$customer->id}}">
                     <td>{{$key}}</td>
@@ -68,7 +78,7 @@
                     </td>
                     <td>{{$customer->points}}</td>
                     <td>{{number_format($customer->deposit - $customer->expense, 2)}}</td>
-                    <td>{{number_format($saleData->grand_total - $saleData->paid_amount, 2)}}</td>
+                    <td>{{number_format($saleData->grand_total - ($saleData->paid_amount + $returnData->returned_total), 2)}}</td>
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{trans('file.action')}}

@@ -55,91 +55,105 @@
                     <th>{{trans('file.Product Name')}}</th>
                     <th>{{trans('file.Sold Amount')}}</th>
                     <th>{{trans('file.Sold Qty')}}</th>
+                    <th>{{trans('Return Qty')}}</th>
                     <th>{{trans('file.In Stock')}}</th>
                 </tr>
             </thead>
             <tbody>
                 @if(!empty($product_name))
-                @foreach($product_id as $key => $pro_id)
-                <tr>
-                    <td>{{$key}}</td>
-                    <td>{{$product_name[$key]}}</td>
-                    <?php
-                        if($warehouse_id == 0){
-                            if($variant_id[$key]) {
-                                $sold_price = DB::table('product_sales')->where([
-                                    ['product_id', $pro_id],
-                                    ['variant_id', $variant_id[$key] ]
-                                ])->whereDate('created_at','>=', $start_date)
-                                  ->whereDate('created_at','<=', $end_date)
-                                  ->sum('total');
+                    @foreach($product_id as $key => $pro_id)
+                        <tr>
+                            <td>{{$key}}</td>
+                            <td>{{$product_name[$key]}}</td>
+                            <?php
+                                if($warehouse_id == 0){
+                                    if($variant_id[$key]) {
+                                        $sold_price = DB::table('product_sales')->where([
+                                            ['product_id', $pro_id],
+                                            ['variant_id', $variant_id[$key] ]
+                                        ])->whereDate('created_at','>=', $start_date)
+                                        ->whereDate('created_at','<=', $end_date)
+                                        ->sum('total');
 
-                                $product_sale_data = DB::table('product_sales')->where([
-                                    ['product_id', $pro_id],
-                                    ['variant_id', $variant_id[$key] ]
-                                ])->whereDate('created_at','>=', $start_date)
-                                  ->whereDate('created_at','<=', $end_date)
-                                  ->get();
-                            }
-                            else {
-                                $sold_price = DB::table('product_sales')->where('product_id', $pro_id)
-                                ->whereDate('created_at','>=', $start_date)->whereDate('created_at','<=', $end_date)->sum('total');
+                                        $product_sale_data = DB::table('product_sales')->where([
+                                            ['product_id', $pro_id],
+                                            ['variant_id', $variant_id[$key] ]
+                                        ])->whereDate('created_at','>=', $start_date)
+                                        ->whereDate('created_at','<=', $end_date)
+                                        ->get();
+                                    }
+                                    else {
+                                        $sold_price = DB::table('product_sales')->where('product_id', $pro_id)
+                                        ->whereDate('created_at','>=', $start_date)->whereDate('created_at','<=', $end_date)->sum('total');
+                                        $product_sale_data = DB::table('product_sales')->where('product_id', $pro_id)->whereDate('created_at','>=', $start_date)->whereDate('created_at','<=', $end_date)->get();
+                                    }
+                                }
+                                else{
+                                    if($variant_id[$key]) {
+                                        $sold_price = DB::table('sales')
+                                            ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
+                                                ['product_sales.product_id', $pro_id],
+                                                ['variant_id', $variant_id[$key] ],
+                                                ['sales.warehouse_id', $warehouse_id]
+                                            ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->sum('total');
+                                        $product_sale_data = DB::table('sales')
+                                            ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
+                                                ['product_sales.product_id', $pro_id],
+                                                ['variant_id', $variant_id[$key] ],
+                                                ['sales.warehouse_id', $warehouse_id]
+                                            ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->get();
+                                    }
+                                    else {
+                                        $sold_price = DB::table('sales')
+                                            ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
+                                                ['product_sales.product_id', $pro_id],
+                                                ['sales.warehouse_id', $warehouse_id]
+                                            ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->sum('total');
+                                        $product_sale_data = DB::table('sales')
+                                            ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
+                                                ['product_sales.product_id', $pro_id],
+                                                ['sales.warehouse_id', $warehouse_id]
+                                            ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->get();
+                                    }
+                                }
+                                $sold_qty = 0;
+                                foreach ($product_sale_data as $product_sale) {
+                                    $unit = DB::table('units')->find($product_sale->sale_unit_id);
+                                    if($unit){
+                                        if($unit->operator == '*')
+                                            $sold_qty += $product_sale->qty * $unit->operation_value;
+                                        elseif($unit->operator == '/')
+                                            $sold_qty += $product_sale->qty / $unit->operation_value;
+                                    }
+                                    else
+                                        $sold_qty += $product_sale->qty;
+                                }
 
-                                $product_sale_data = DB::table('product_sales')->where('product_id', $pro_id)->whereDate('created_at','>=', $start_date)->whereDate('created_at','<=', $end_date)->get();
-                            }
-                        }
-                        else{
-                            if($variant_id[$key]) {
-                                $sold_price = DB::table('sales')
-                                    ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
-                                        ['product_sales.product_id', $pro_id],
-                                        ['variant_id', $variant_id[$key] ],
-                                        ['sales.warehouse_id', $warehouse_id]
-                                    ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->sum('total');
-                                $product_sale_data = DB::table('sales')
-                                    ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
-                                        ['product_sales.product_id', $pro_id],
-                                        ['variant_id', $variant_id[$key] ],
-                                        ['sales.warehouse_id', $warehouse_id]
-                                    ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->get();
-                            }
-                            else {
-                                $sold_price = DB::table('sales')
-                                    ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
-                                        ['product_sales.product_id', $pro_id],
-                                        ['sales.warehouse_id', $warehouse_id]
-                                    ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->sum('total');
-                                $product_sale_data = DB::table('sales')
-                                    ->join('product_sales', 'sales.id', '=', 'product_sales.sale_id')->where([
-                                        ['product_sales.product_id', $pro_id],
-                                        ['sales.warehouse_id', $warehouse_id]
-                                    ])->whereDate('sales.created_at','>=', $start_date)->whereDate('sales.created_at','<=', $end_date)->get();
-                            }
-                        }
-                        $sold_qty = 0;
-                        foreach ($product_sale_data as $product_sale) {
-                            $unit = DB::table('units')->find($product_sale->sale_unit_id);
-                            if($unit){
-                                if($unit->operator == '*')
-                                    $sold_qty += $product_sale->qty * $unit->operation_value;
-                                elseif($unit->operator == '/')
-                                    $sold_qty += $product_sale->qty / $unit->operation_value;
-                            }
-                            else
-                                $sold_qty += $product_sale->qty;
-                        }
-                    ?>
-                    <td>{{number_format((float)$sold_price, 2, '.', '')}}</td>
-                    <td>{{$sold_qty}}</td>
-                    <td>{{$product_qty[$key]}}</td>
-                </tr>
-                @endforeach
+                                $product_return_data = DB::table('returns')
+                                                        ->join('product_returns', 'returns.id', '=', 'product_returns.return_id')
+                                                        ->join('sales', 'returns.sale_id', '=', 'sales.id')
+                                                        ->where([
+                                                            ['product_returns.product_id', $pro_id]
+                                                        ])
+                                                        ->get();
+                                $return_qty = 0;
+                                foreach ($product_return_data as $product_return) {
+                                    $return_qty += $product_return->qty;
+                                }
+                            ?>
+                            <td>{{number_format((float)$sold_price, 2, '.', '')}}</td>
+                            <td>{{$sold_qty}}</td>
+                            <td>{{$return_qty}}</td>
+                            <td>{{$product_qty[$key]}}</td>
+                        </tr>
+                    @endforeach
                 @endif
             </tbody>
             <tfoot>
                 <th></th>
                 <th>Total</th>
                 <th>0.00</th>
+                <th>0</th>
                 <th>0</th>
                 <th>0</th>
             </tfoot>

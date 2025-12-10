@@ -29,4 +29,9 @@ class Sale extends Model
     {
     	return $this->belongsTo('App\User');
     }
+
+    public function returns()
+    {
+        return $this->hasMany(\App\Returns::class, 'sale_id');
+    }
 }

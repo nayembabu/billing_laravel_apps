@@ -52,7 +52,7 @@
                     @else
                     <td>0.00</td>
                     @endif
-                    <td>{{number_format((float)($sale_data->grand_total - $sale_data->paid_amount), 2, '.', '')}}</td>
+                    <td>{{number_format((float)($sale_data->grand_total - ($sale_data->paid_amount + $sale_data->return_amount)), 2, '.', '')}}</td>
                 </tr>
                 @endforeach
             </tbody>
