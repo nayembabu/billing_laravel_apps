@@ -128,7 +128,7 @@ class SaleController extends Controller
         if ($request->input('length') != -1)
             $limit = $request->input('length');
         else
-            $limit = $totalData;
+        $limit = $totalData;
         $start = $request->input('start');
         $order = 'sales.' . $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
@@ -223,6 +223,7 @@ class SaleController extends Controller
                     $nestedData['currency_rate'] = $a->exchange_rate;
                     $nestedData['currency_name'] = $a->code;
                 }
+
                 $nestedData['id'] = $sale->id;
                 $nestedData['key'] = $key;
                 $nestedData['date'] = date(config('date_format'), strtotime($sale->created_at->toDateString()));
@@ -268,6 +269,7 @@ class SaleController extends Controller
                     $nestedData['payment_status'] = '<div class="badge badge-success">' . trans('file.Paid') . '</div>';
 
                 $nestedData['grand_total'] =  number_format($sale->grand_total, 2);
+                $nestedData['qty'] =  number_format($sale->total_qty, 2);
 
                 $nestedData['paid_amount'] = number_format($sale->paid_amount, 2);
                 $nestedData['due'] = number_format($sale->grand_total - ($sale->paid_amount + $sale->returns->sum('total_price')), 2);

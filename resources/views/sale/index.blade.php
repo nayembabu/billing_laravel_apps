@@ -99,6 +99,7 @@
                         <th>{{ trans('file.Sale Status') }}</th>
                         <th>{{ trans('file.Payment Status') }}</th>
                         <th>{{ trans('file.grand total') }}</th>
+                        <th>{{ trans('Quantity') }}</th>
                         <th>{{ trans('file.Paid') }}</th>
                         <th>{{ trans('file.Due') }}</th>
                         <th class="not-exported">{{ trans('file.action') }}</th>
@@ -108,6 +109,7 @@
                 <tfoot class="tfoot active">
                     <th></th>
                     <th>{{ trans('file.Total') }}</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -129,9 +131,7 @@
                 <div class="container mt-3 pb-2 border-bottom">
                     <div class="row">
                         <div class="col-md-6 d-print-none">
-                            <button id="print-btn" type="button" class="btn btn-default btn-sm"><i
-                                    class="dripicons-print"></i> {{ trans('file.Print') }}</button>
-
+                            <button id="print-btn" type="button" class="btn btn-default btn-sm"><i class="dripicons-print"></i> {{ trans('file.Print') }}</button>
                             {{ Form::open(['route' => 'sale.sendmail', 'method' => 'post', 'class' => 'sendmail-form']) }}
                             <input type="hidden" name="sale_id">
                             <button class="btn btn-default btn-sm d-print-none"><i class="dripicons-mail"></i>
@@ -1016,6 +1016,9 @@
                 },
                 {
                     "data": "grand_total"
+                },
+                {
+                    "data": "qty"
                 },
                 {
                     "data": "paid_amount"
