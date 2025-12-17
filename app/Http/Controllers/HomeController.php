@@ -18,6 +18,7 @@ use App\Customer;
 use App\Product;
 use App\RewardPointSetting;
 use App\Product_Warehouse;
+use App\MoneyTransfer;
 use DB;
 use Auth;
 use Printing;
@@ -25,7 +26,7 @@ use Rawilk\Printing\Contracts\Printer;
 use Spatie\Permission\Models\Role;
 /*use vendor\autoload;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
-use Mike42\Escpos\Printer;*/
+use Mike42\Escpos\Printer; */
 
 class HomeController extends Controller
 {
@@ -255,7 +256,6 @@ class HomeController extends Controller
             $purchase_return_index = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query2))->get();
             $expense_index = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $payroll_index = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-
         }
 
         $best_selling_qty = Product_Sale::join('products', 'products.id', '=', 'product_sales.product_id')
@@ -336,10 +336,35 @@ class HomeController extends Controller
             $yearly_purchase_amount[] = number_format((float)$purchase_amount, 2, '.', '');
             $start = strtotime("+1 month", $start);
         }
+
+
+        $product_warehouse_sum = Product_Warehouse::sum('qty');
+        $product_sum = Product::sum('qty');
+        $account = Account::where('is_active', true)->get();
+
+        $lims_account_list = Account::where('is_active', true)->get();
+        $debit = [];
+        $credit = [];
+        foreach ($lims_account_list as $account) {
+            $payment_recieved = Payment::whereNotNull('sale_id')->where('account_id', $account->id)->sum('amount');
+            $payment_sent = Payment::whereNotNull('purchase_id')->where('account_id', $account->id)->sum('amount');
+            $returns = DB::table('returns')->where('account_id', $account->id)->sum('grand_total');
+            $return_purchase = DB::table('return_purchases')->where('account_id', $account->id)->sum('grand_total');
+            $expenses = DB::table('expenses')->where('account_id', $account->id)->sum('amount');
+            $payrolls = DB::table('payrolls')->where('account_id', $account->id)->sum('amount');
+            $sent_money_via_transfer = MoneyTransfer::where('from_account_id', $account->id)->sum('amount');
+            $recieved_money_via_transfer = MoneyTransfer::where('to_account_id', $account->id)->sum('amount');
+
+            $credit[] = $payment_recieved + $return_purchase + $recieved_money_via_transfer + $account->initial_balance;
+            $debit[] = $payment_sent + $returns + $expenses + $payrolls + $sent_money_via_transfer;
+        }
+
+
+
         //making strict mode true for this query
         config()->set('database.connections.mysql.strict', true);
         DB::reconnect();
-        return view('index', compact('revenue', 'purchase', 'expense', 'return', 'purchase_return', 'profit', 'payment_recieved', 'payment_sent', 'month', 'yearly_sale_amount', 'yearly_purchase_amount', 'recent_sale', 'recent_purchase', 'recent_quotation', 'recent_payment', 'best_selling_qty', 'yearly_best_selling_qty', 'yearly_best_selling_price', 'all_permission', 'payment_recieved_index', 'payment_sent_index', 'return_index', 'purchase_return_index', 'expense_index', 'payroll_index'));
+        return view('index', compact('revenue', 'purchase', 'expense', 'return', 'purchase_return', 'profit', 'payment_recieved', 'payment_sent', 'month', 'yearly_sale_amount', 'yearly_purchase_amount', 'recent_sale', 'recent_purchase', 'recent_quotation', 'recent_payment', 'best_selling_qty', 'yearly_best_selling_qty', 'yearly_best_selling_price', 'all_permission', 'payment_recieved_index', 'payment_sent_index', 'return_index', 'purchase_return_index', 'expense_index', 'payroll_index', 'product_warehouse_sum', 'product_sum', 'account', 'lims_account_list', 'debit', 'credit'));
     }
 
     public function dashboardFilter($start_date, $end_date)

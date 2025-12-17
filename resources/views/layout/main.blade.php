@@ -338,7 +338,7 @@
                 ->first();
             */
             ?>
-            <!-- 
+            <!--
             @if ($index_permission_active)
                 <li><a href="#quotation" aria-expanded="false" data-toggle="collapse"> <i
                             class="dripicons-document"></i><span>{{ trans('file.Quotation') }}</span><span></a>

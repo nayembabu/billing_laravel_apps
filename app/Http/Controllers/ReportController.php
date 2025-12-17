@@ -1391,8 +1391,11 @@ class ReportController extends Controller
                 }
             }
         }
-        /*$totalData = count($data);
-        $totalFiltered = $totalData;*/
+        /*
+        $totalData = count($data);
+        $totalFiltered = $totalData;
+        */
+
         $json_data = array(
             "draw"            => intval($request->input('draw')),
             "recordsTotal"    => intval($totalData),

@@ -277,6 +277,7 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('accounts/make-default/{id}', 'AccountsController@makeDefault');
 	Route::get('accounts/balancesheet', 'AccountsController@balanceSheet')->name('accounts.balancesheet');
 	Route::post('accounts/account-statement', 'AccountsController@accountStatement')->name('accounts.statement');
+	Route::get('accounts/account-statement', 'AccountsController@accountStatement')->name('accounts.statement');
 	Route::resource('accounts', 'AccountsController');
 	Route::resource('money-transfers', 'MoneyTransferController');
 	//HRM routes

@@ -99,7 +99,46 @@
                     </div>
                   </div>
                 </div>
+                <!-- Total stock item widget-->
+                <a href="{{route('report.product', ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'), 'warehouse_id' => 0])}}" class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-document" style="color: #3349FF"></i></div>
+                    <div>
+                        <div class="count-number cash-in-hand">{{number_format((float)($product_sum), 2, '.', '') }}</div>
+                        <div class="name"><strong style="color: #3349FF">{{trans('Product in Stock')}}</strong></div>
+                    </div>
+                  </div>
+                </a>
+
               </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-12 col-sm-12 mt-4">
+                        <div class="brand-text float-left ">
+                            <h3> <span>BANK BALANCE </span> </h3>
+                        </div>
+                    </div>
+
+                    @foreach($lims_account_list as $key=>$account)
+                        <a href="{{route('accounts.balancesheet')}}" class="col-sm-3">
+                            <div class="wrapper count-title">
+                                <div class="icon"><i class=" dripicons-store" style="color: #3349FF"></i></div>
+                                <div>
+                                    <div class="count-number cash-in-hand">{{number_format((float)($credit[$key] - $debit[$key]), 2, '.', '')}}</div>
+                                    <div class="name"><strong style="color: #3349FF">{{$account->name}}</strong></div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+
+
+
+
+
+
+
             </div>
             @endif
             @if(in_array("cash_flow", $all_permission))

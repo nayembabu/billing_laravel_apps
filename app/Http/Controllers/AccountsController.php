@@ -131,6 +131,13 @@ class AccountsController extends Controller
     public function accountStatement(Request $request)
     {
         $data = $request->all();
+        if (!$request->account_id || !$request->start_date || !$request->end_date || !isset($data['type'])) {
+            $data['account_id'] = Account::where('is_default', true)->first()->id;
+            $data['start_date'] = date("Y-m-d", strtotime("first day of this month"));;
+            $data['end_date'] = date("Y-m-d");;
+            $data['type'] = '0';
+        }
+
         $lims_account_data = Account::find($data['account_id']);
         $credit_list = new Collection;
         $debit_list = new Collection;
@@ -140,7 +147,7 @@ class AccountsController extends Controller
         $payroll_list = new Collection;
         $recieved_money_transfer_list = new Collection;
         $sent_money_transfer_list = new Collection;
-        
+
         if($data['type'] == '0' || $data['type'] == '2') {
             $credit_list = Payment::whereNotNull('sale_id')
                             ->where('account_id', $data['account_id'])
