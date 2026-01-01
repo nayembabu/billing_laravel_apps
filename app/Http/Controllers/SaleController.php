@@ -1395,7 +1395,14 @@ class SaleController extends Controller
     public function productSaleData($id)
     {
 
-        $sale = Sale::where('id',$id)->first();
+        // $sale = Sale::where('id',$id)->first();
+        $sale = Sale::with('returns')->find($id);
+
+        // $sale = Sale::join('returns', 'returns.sale_id', '=', 'sales.id')
+        //             ->where('sales.id', $id)
+        //             ->select('sales.*', 'returns.*')
+        //             ->first();
+
         $getCurrency = Currency::where('id',$sale->currency_id)->first();
 
         $lims_product_sale_data = Product_Sale::where('sale_id', $id)->get();
@@ -1429,6 +1436,12 @@ class SaleController extends Controller
             $product_sale[6][$key] = $product_sale_data->total;
             $product_sale[12][$key] = $product_sale_data->net_weight;
             $product_sale[13][$key] = $product_sale_data->gross_weight;
+
+            $product_sale[1004][$key] = $sale->returns->sum('total_qty');
+            $product_sale[1005][$key] = $sale->returns->sum('total_price');
+            $product_sale[1006][$key] = $sale->returns->sum('grand_total');
+
+
         }
 
             $product_sale[8] = $getCurrency->exchange_rate;

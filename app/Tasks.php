@@ -1,0 +1,22 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Tasks extends Model
+{
+	protected $table = 'tasks';
+    protected $fillable =[
+        "user_id", "title", "note", "status", "priority", "start_date", "due_date", "tags", "is_billable", "created_at", "updated_at"
+    ];
+
+    public function user()
+    {
+    	return $this->belongsTo('App\User');
+    }
+
+
+
+
+}

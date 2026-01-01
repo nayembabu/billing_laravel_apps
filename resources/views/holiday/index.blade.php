@@ -145,7 +145,6 @@
 	var date = $('.date');
     date.datepicker({
      format: "dd-mm-yyyy",
-     startDate: "<?php echo date('d-m-Y'); ?>",
      autoclose: true,
      todayHighlight: true
      });

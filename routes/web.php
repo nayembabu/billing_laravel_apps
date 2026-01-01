@@ -318,6 +318,11 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::post('/change-currency', [CurrencyController::class, 'changeCurrency'])->name('change-currency');
 
 	Route::get('/home', 'HomeController@index')->name('home');
+	Route::get('/tasks', 'HomeController@tasks_view_file')->name('task_view');
+	Route::get('/task-get_data', 'HomeController@tasks_view_fileget_tasks_data_api')->name('task.get_data');
+
+
+
 	Route::get('my-transactions/{year}/{month}', 'HomeController@myTransaction');
 });
 

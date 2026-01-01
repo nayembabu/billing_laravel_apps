@@ -467,6 +467,7 @@
                     </ul>
                 </li>
             @endif
+            <li><a href="{{ route('task_view') }}"> <i class="dripicons-to-do"></i><span>Task</span></a></li>
             <?php
             $department_active = DB::table('permissions')
                 ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
@@ -862,7 +863,6 @@
                     </ul>
                 </li>
             @endif
-
             <li><a href="#setting" aria-expanded="false" data-toggle="collapse"> <i
                         class="dripicons-gear"></i><span>{{ trans('file.settings') }}</span></a>
                 <ul id="setting" class="collapse list-unstyled ">

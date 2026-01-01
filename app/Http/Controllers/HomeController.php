@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Tasks;
 use App\Sale;
 use App\Returns;
 use App\ReturnPurchase;
@@ -570,6 +571,9 @@ class HomeController extends Controller
             $data[6] = $cash_in_hand;
         }
 
+        $data['starting_date'] = $start_date;
+        $data['ending_date'] = $end_date;
+
         return $data;
     }
 
@@ -603,4 +607,17 @@ class HomeController extends Controller
     {
         setcookie('theme', $theme, time() + (86400 * 365), "/");
     }
+
+    public function tasks_view_file()
+    {
+        $tasks = Tasks::with('user')->get();
+        return view('tasks.index', compact('tasks'));
+    }
+
+    public function get_tasks_data_api()
+    {
+        $data['tasks'] = Tasks::with('user')->get();
+        return $data;
+    }
+
 }

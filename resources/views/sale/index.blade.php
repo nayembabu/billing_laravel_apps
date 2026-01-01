@@ -158,7 +158,7 @@
                         <th>#</th>
                         <th>{{ trans('file.product') }}</th>
                         <th>{{ trans('file.Box No') }}</th>
-                        <th>{{ trans('file.Total WG') }}</th>
+                        <th>{{ trans('Total Qnt') }}</th>
                         <th>{{ trans('file.N W') }}</th>
                         <th>{{ trans('file.G W') }}</th>
                         <th>{{ trans('file.Unit') }}</th>
@@ -518,6 +518,18 @@
         $("#sale-details input[name='sale_id']").val(sale[13]);
         var htmltext = '<h3 style=text-align:center;>Invoice</h3><hr><table class="c" border="0" cellspacing="0" width="100%"><tr style=text-align:left><td><b>{{trans("file.Booking Date")}}:</b> '+sale[0]+' <br><b>{{trans("file.reference")}}:</b> '+sale[1]+' <br><b>{{trans("file.Warehouse")}}: </b>'+sale[27]+'</br><b>{{trans("file.Sale Status")}}: </b>'+sale[2]+'</br></td><td class="text-center"><h3>{{ $general_setting->site_title }} <br> <img src="{{ asset('logo/' . $general_setting->site_logo) }}" class="img-fluid" width="150" alt="{{ $general_setting->site_title }}" /></h3><span>Unit 6, 153-155 Ley Street, Ilford, IG1 4BL, London, United Kingdom.<br>Phone: 07739371171, 07947258297</span></td></tr></table><table border="0" cellspacing="0" width="100%"><tr style=text-align:center><th>Consignee\’s Name and address</th><th>Receiver name & address</th></tr><tr style=text-align:left><td>'+sale[3]+'<br>'+sale[4]+'<br>'+sale[5]+'<br>'+sale[6]+'<br>'+sale[7]+'<br>'+sale[8]+'<br></td><td>'+sale[9]+'<br>'+sale[10]+'<br>'+sale[11]+'<br>'+sale[12]+'<br></td></tr></table>';
         $.get('sales/product_sale/' + sale[13], function(data){
+            let return_qnt = '';
+            let return_text = '';
+            let return_ttl_amnt = 0;
+            if (Array.isArray(data[1004]) && data[1004][0] === 0) {
+                return_qnt = data[1004][0];
+                return_text = '';
+                return_ttl_amnt = 0;
+            }else {
+                return_text = '<div style="margin-left: 100px; ">'+data[1004][0]+' Product Return</div>';
+                return_qnt = data[1004][0];
+                return_ttl_amnt = data[1006][0];
+            }
             $(".product-sale-list tbody").remove();
             var name_code = data[0];
             var qty = data[1];
@@ -573,7 +585,7 @@
 
             newBody.append(newRow);
             var newRow = $("<tr class=a>");
-            cols = '<td rowspan=11 colspan=9 style="border:none; vertical-align: top;" class=b><p style="padding: 0 10px"><strong>{{trans("file.Sale Description")}}:</strong> '+sale[23]+'</td>';
+            cols = '<td rowspan=11 colspan=9 style="border:none; vertical-align: top;" class=b><p style="padding: 0 10px"><strong>{{trans("file.Sale Description")}}:</strong>'+return_text+' '+sale[23]+'</td>';
 
             cols += '<td style=text-align:right;font-size:12px;min-width:105px;><strong>{{trans("file.Shipping Cost")}}:</strong></td>';
             cols += '<td>' + sale[20] * currency_rate + '</td>';
@@ -636,6 +648,17 @@
             newRow.append(cols);
             newBody.append(newRow);
 
+            if (Array.isArray(data[1004]) && data[1004][0] === 0) {
+
+            }else {
+                var newRow = $("<tr class=a>");
+                // cols = '<td style="border:none" class=b  colspan=9></td>';
+                cols = '<td style=text-align:right;font-size:12px;><strong>{{trans("Return")}}:</strong></td>';
+                cols += '<td>' + return_ttl_amnt+ '</td>';
+                newRow.append(cols);
+                newBody.append(newRow);
+            }
+
             var newRow = $("<tr class=a>");
             // cols = '<td style="border:none" class=b  colspan=9></td>';
             cols = '<td style=text-align:right;font-size:12px;><strong>{{trans("file.Paid Amount")}}:</strong></td>';
@@ -646,7 +669,7 @@
             var newRow = $("<tr class=a>");
             // cols = '<td style="border:none" class=b  colspan=9></td>';
             cols = '<td style=text-align:right;font-size:12px;><strong>{{trans("file.Due")}}:</strong></td>';
-            cols += '<td>' + parseFloat((sale[21] - sale[22]) * currency_rate).toFixed(2) + '</td>';
+            cols += '<td>' + (parseFloat((sale[21] - sale[22]) * currency_rate).toFixed(2) - parseFloat(return_ttl_amnt)) + '</td>';
             newRow.append(cols);
 
             newBody.append(newRow);
