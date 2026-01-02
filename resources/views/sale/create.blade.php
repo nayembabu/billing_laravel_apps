@@ -189,7 +189,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                       
+
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>{{ trans('file.Order Tax') }}</label>
@@ -714,7 +714,7 @@
                                 <div id="edit_net_weight" class="col-md-4 form-group">
                                     <label>{{ trans('file.Net Weight') }}</label>
                                     <input type="number" name="edit_net_weight" class="form-control" />
-                                    
+
                                 </div>
                                 <div id="edit_gross_weight" class="col-md-4 form-group">
                                     <label>{{ trans('file.Gross Weight') }}</label>
@@ -1295,7 +1295,7 @@
                     '" class="form-control imei_number" placeholder="Type imei or serial numbers and separate them by comma. Example:1001,2001" step="any"></div>';
                 $("#editModal .modal-element").append(htmlText);
             }
-          
+
             var row_product_name = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(1)')
                 .text();
             $('input[name="edit_product_name"]').val(row_product_name);
@@ -1332,7 +1332,7 @@
                 row_product_price = product_price[rowindex];
                 $("#edit_unit").hide();
             }
-         
+
             $('input[name="edit_unit_price"]').val(row_product_price.toFixed(2));
             $('input[name="edit_net_weight"]').val($('.net_weight'+row_product_code).val());
             $('input[name="edit_gross_weight"]').val($('.gross_weight'+row_product_code).val());

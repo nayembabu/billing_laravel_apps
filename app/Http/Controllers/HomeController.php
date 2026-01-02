@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Tasks;
 use App\Sale;
@@ -20,6 +22,7 @@ use App\Product;
 use App\RewardPointSetting;
 use App\Product_Warehouse;
 use App\MoneyTransfer;
+use App\User;
 use DB;
 use Auth;
 use Printing;
@@ -611,13 +614,55 @@ class HomeController extends Controller
     public function tasks_view_file()
     {
         $tasks = Tasks::with('user')->get();
-        return view('tasks.index', compact('tasks'));
+        $users = User::get();
+        return view('tasks.index', compact('tasks', 'users'));
     }
 
-    public function get_tasks_data_api()
+    public function tasks_view_fileget_tasks_data_api()
     {
         $data['tasks'] = Tasks::with('user')->get();
         return $data;
+    }
+
+    public function task_store_entry(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title'       => 'required|string|max:250',
+            'start_date'  => 'required|date',
+            'end_date'    => 'required|date|after_or_equal:start_date',
+            'user_id'     => 'required|integer',
+            'priority'    => 'required',
+            'status'      => 'required',
+            'tag'         => 'nullable|string|max:200',
+            'description' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'status'  => 0,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $task = Tasks::create([
+            'title'       => $request->title,
+            'short_title' => $request->short,
+            'note'        => $request->note,
+            'start_date'  => date('Y-m-d', strtotime($request->start_date)),
+            'due_date'    => date('Y-m-d', strtotime($request->end_date)),
+            'user_id'     => $request->user_id,
+            'priority'    => $request->priority,
+            'status'      => $request->status,
+            'tags'        => $request->tag,
+            'description' => $request->description,
+        ]);
+
+        return response()->json([
+            'message' => 'Task created successfully',
+            'status'  => 1,
+            'task'    => $task
+        ]);
     }
 
 }

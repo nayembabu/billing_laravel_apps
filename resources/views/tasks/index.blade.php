@@ -46,6 +46,8 @@
         /* Pagination Styling */
         .page-item.active .page-link { background-color: #333; border-color: #333; }
         .page-link { color: #333; }
+        .is-invalid { border: 1px solid red; }
+
     </style>
 @if(session()->has('not_permitted'))
   <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
@@ -131,45 +133,7 @@
                                         <th>Priority</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-
-
-
-                                    @foreach($tasks as $task)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                <a href="#" class="task-name text-dark font-weight-bold d-block">{{ $task->title }}</a>
-                                                <small class="text-muted">{{ $task->short_title }}</small>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <div class="status-dropdown-btn" data-toggle="dropdown">In Progress</div>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">Mark as Not Started</a>
-                                                        <a class="dropdown-item" href="#">Mark as Testing</a>
-                                                        <a class="dropdown-item" href="#">Mark as Awaiting Feedback</a>
-                                                        <a class="dropdown-item" href="#">Mark as Complete</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>2025-12-30</td>
-                                            <td>2025-12-30</td>
-                                            <td><img src="https://i.pravatar.cc/150?u=1" class="avatar"></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a href="#" class="priority-dropdown-link" data-toggle="dropdown">Medium</a>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">Low</a><a class="dropdown-item" href="#">High</a><a class="dropdown-item" href="#">Urgent</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-
-
-                                </tbody>
+                                <tbody class="data_assigning"></tbody>
                             </table>
                         </div>
 
@@ -193,7 +157,7 @@
                         <div class="modal-body">
                             <form id="taskForm">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
+                                    <!-- <div>
                                         <div class="custom-control custom-checkbox custom-control-inline">
                                             <input type="checkbox" class="custom-control-input" id="publicTask">
                                             <label class="custom-control-label" for="publicTask">Public</label>
@@ -203,19 +167,29 @@
                                             <label class="custom-control-label" for="billableTask">Billable</label>
                                         </div>
                                     </div>
-                                    <a href="#" class="text-primary small font-weight-bold">Attach Files</a>
+                                    <a href="#" class="text-primary small font-weight-bold">Attach Files</a> -->
                                 </div>
 
                                 <hr class="mt-0">
 
                                 <div class="form-group">
                                     <label class="font-weight-bold small"><span class="text-danger">*</span> Subject</label>
-                                    <input type="text" class="form-control form-control-sm border-primary" style="border-width: 1.5px;">
+                                    <input type="text" class="form-control form-control-sm border-primary tasks_title " style="border-width: 1.5px;">
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="font-weight-bold small text-muted">Hourly Rate</label>
-                                    <input type="number" class="form-control form-control-sm" value="0">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="font-weight-bold small"><span class="text-danger">*</span>Short Details</label>
+                                            <input type="text" class="form-control form-control-sm border-primary short_details " style="border-width: 1.5px;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="font-weight-bold small"><span class="text-danger">*</span>Note</label>
+                                            <input type="text" class="form-control form-control-sm border-primary tasks_notes " style="border-width: 1.5px;">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -223,7 +197,7 @@
                                         <div class="form-group">
                                             <label class="font-weight-bold small"><span class="text-danger">*</span> Start Date</label>
                                             <div class="input-group input-group-sm">
-                                                <input type="text" class="form-control" value="2025-12-30">
+                                                <input type="text" class="form-control date start_datess" value="{{date('d-m-Y')}}">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                                 </div>
@@ -234,7 +208,7 @@
                                         <div class="form-group">
                                             <label class="font-weight-bold small text-muted">Due Date</label>
                                             <div class="input-group input-group-sm">
-                                                <input type="text" class="form-control" placeholder="">
+                                                <input type="text" class="form-control date end_datess" value="{{date('d-m-Y')}}">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                                 </div>
@@ -243,15 +217,27 @@
                                     </div>
                                 </div>
 
-                                <div class="row justify-content-end">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="font-weight-bold small text-muted">Priority</label>
-                                            <select class="form-control form-control-sm">
-                                                <option>Medium</option>
-                                                <option>Low</option>
-                                                <option>High</option>
-                                                <option>Urgent</option>
+                                            <label class="font-weight-bold small text-muted">Assignees To</label>
+                                            <select class="form-control form-control-sm user_selected_idd ">
+                                                <option value="" >Select User</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{$user->id}}" >{{$user->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="font-weight-bold small text-muted ">Priority</label>
+                                            <select class="form-control form-control-sm priority_selecteds">
+                                                <option value="">Select Priority</option>
+                                                <option value="1" >Low</option>
+                                                <option value="2" >Medium</option>
+                                                <option value="3" >High</option>
+                                                <option value="4" >Urgent</option>
                                             </select>
                                         </div>
                                     </div>
@@ -260,68 +246,40 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="font-weight-bold small text-muted">Repeat every</label>
-                                            <select class="form-control form-control-sm text-muted">
-                                                <option>Nothing selected</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="font-weight-bold small text-muted">Related To</label>
-                                            <select class="form-control form-control-sm text-muted">
-                                                <option>Nothing selected</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="font-weight-bold small text-muted">Assignees</label>
-                                            <select class="form-control form-control-sm">
-                                                <option>Eldon McCullough</option>
+                                            <label class="font-weight-bold small text-muted  ">Status</label>
+                                            <select class="form-control form-control-sm selected_status_opt">
+                                                <option value="" class="dropdown-item">Select Status</option>
+                                                <option value="1" class="dropdown-item">In Progress</option>
+                                                <option value="2" class="dropdown-item">Mark as Not Started</option>
+                                                <option value="3" class="dropdown-item">Mark as Testing</option>
+                                                <option value="4" class="dropdown-item">Mark as Awaiting Feedback</option>
+                                                <option value="5" class="dropdown-item">Mark as Complete</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="font-weight-bold small text-muted">Followers</label>
-                                            <select class="form-control form-control-sm text-muted">
-                                                <option>Nothing selected</option>
-                                            </select>
+                                            <label class="font-weight-bold small text-muted"><i class="fas fa-tag mr-1"></i> Tags</label>
+                                            <input type="text" class="form-control form-control-sm tag_type_here " placeholder="Tag" style="border-top:none; border-left:none; border-right:none; border-radius:0;">
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="font-weight-bold small text-muted"><i class="fas fa-tag mr-1"></i> Tags</label>
-                                    <input type="text" class="form-control form-control-sm" placeholder="Tag" style="border-top:none; border-left:none; border-right:none; border-radius:0;">
                                 </div>
 
                                 <hr>
 
                                 <div class="form-group">
                                     <label class="font-weight-bold small text-muted">Task Description</label>
-                                    <textarea class="form-control" rows="4" placeholder="Add Description"></textarea>
+                                    <textarea class="form-control task_description_typings " rows="4" placeholder="Add Description"></textarea>
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-dark btn-sm px-3">Save</button>
+                            <button type="button" class="btn btn-dark btn-sm px-3 entry_new_task_btn ">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-
 
 
 
@@ -339,54 +297,210 @@
 
 
 $(document).ready(function() {
-    const rowsPerPage = 5;
-    let currentPage = 1;
-    const $tableBody = $('.table-tasks tbody');
-    const $rows = $tableBody.find('tr');
-
-    function showPage(page, rowsToDisplay) {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        rowsToDisplay.hide();
-        const visibleRows = rowsToDisplay.slice(start, end);
-        visibleRows.show();
-
-        const total = rowsToDisplay.length;
-        const currentEnd = end > total ? total : end;
-        $('#tableInfo').text(total > 0 ? `Showing ${start + 1} to ${currentEnd} of ${total} entries` : "No entries found");
-    }
-
-    function initPagination(rowsToPaginate) {
-        const pageCount = Math.ceil(rowsToPaginate.length / rowsPerPage);
-        const $controls = $('#paginationControls');
-        $controls.empty();
-        for (let i = 1; i <= pageCount; i++) {
-            const $li = $(`<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`);
-            $li.click(function(e) {
-                e.preventDefault();
-                currentPage = i;
-                showPage(currentPage, rowsToPaginate);
-                $(this).addClass('active').siblings().removeClass('active');
-            });
-            $controls.append($li);
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-        showPage(1, rowsToPaginate);
-    }
-
-    $('#taskSearch').on('keyup', function() {
-        const value = $(this).val().toLowerCase();
-        const filteredRows = $rows.filter(function() {
-            return $(this).text().toLowerCase().indexOf(value) > -1;
-        });
-        $rows.hide();
-        initPagination(filteredRows);
     });
 
-    initPagination($rows);
 
-    function get_tasks_data_info() {}
+    get_tasks_data_info();
+
+    function get_tasks_data_info() {
+        $.ajax({
+            type: "get",
+            url: "task-get_data",
+            data: "",
+            dataType: "json",
+            success: function (resp) {
+                let res = resp.tasks;
+                let data_html = '';
+                for (let n = 0; n < res.length; n++) {
+                    data_html += `<tr>
+                                        <td>${n+1}</td>
+                                        <td>
+                                            <a class="task-name text-dark font-weight-bold d-block">${res[n].title}</a>
+                                            <small class="text-muted">${res[n].short_title || ''},</small>
+                                            <small class="text-muted">=> ${res[n].note || ''}</small>
+                                        </td>
+                                        <td>
+                                            <select class="status-dropdown-btn " data-toggle="dropdown" >
+                                                <option value="1" ${res[n].status == 1 ? 'selected' : ''} class="dropdown-item">In Progress</option>
+                                                <option value="2" ${res[n].status == 2 ? 'selected' : ''} class="dropdown-item">Mark as Not Started</option>
+                                                <option value="3" ${res[n].status == 3 ? 'selected' : ''} class="dropdown-item">Mark as Testing</option>
+                                                <option value="4" ${res[n].status == 4 ? 'selected' : ''} class="dropdown-item">Mark as Awaiting Feedback</option>
+                                                <option value="5" ${res[n].status == 5 ? 'selected' : ''} class="dropdown-item">Mark as Complete</option>
+                                            </select>
+                                        </td>
+                                        <td>${res[n].start_date}</td>
+                                        <td>${res[n].due_date}</td>
+                                        <td>${res[n].user.name}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <select class="priority-dropdown-link" data-toggle="dropdown">
+                                                    <option  value="1" ${res[n].priority == 1 ? 'selected' : ''}  class="dropdown-item" >Low</option>
+                                                    <option  value="2" ${res[n].priority == 2 ? 'selected' : ''}  class="dropdown-item" >Medium</option>
+                                                    <option  value="3" ${res[n].priority == 3 ? 'selected' : ''}  class="dropdown-item" >High</option>
+                                                    <option  value="4" ${res[n].priority == 4 ? 'selected' : ''}  class="dropdown-item" >Urgent</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>`
+                }
+
+                $('.data_assigning').html(data_html);
+
+                const rowsPerPage = 5;
+                let currentPage = 1;
+                const $tableBody = $('.table-tasks tbody');
+                const $rows = $tableBody.find('tr');
+
+                function showPage(page, rowsToDisplay) {
+                    const start = (page - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+                    rowsToDisplay.hide();
+                    const visibleRows = rowsToDisplay.slice(start, end);
+                    visibleRows.show();
+
+                    const total = rowsToDisplay.length;
+                    const currentEnd = end > total ? total : end;
+                    $('#tableInfo').text(total > 0 ? `Showing ${start + 1} to ${currentEnd} of ${total} entries` : "No entries found");
+                }
+
+                function initPagination(rowsToPaginate) {
+                    const pageCount = Math.ceil(rowsToPaginate.length / rowsPerPage);
+                    const $controls = $('#paginationControls');
+                    $controls.empty();
+                    for (let i = 1; i <= pageCount; i++) {
+                        const $li = $(`<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`);
+                        $li.click(function(e) {
+                            e.preventDefault();
+                            currentPage = i;
+                            showPage(currentPage, rowsToPaginate);
+                            $(this).addClass('active').siblings().removeClass('active');
+                        });
+                        $controls.append($li);
+                    }
+                    showPage(1, rowsToPaginate);
+                }
+
+                $('#taskSearch').on('keyup', function() {
+                    const value = $(this).val().toLowerCase();
+                    const filteredRows = $rows.filter(function() {
+                        return $(this).text().toLowerCase().indexOf(value) > -1;
+                    });
+                    $rows.hide();
+                    initPagination(filteredRows);
+                });
+
+                initPagination($rows);
+
+            }
+        });
+    }
 
 
+    $(document).on('click', '.entry_new_task_btn', function (e) {
+        e.preventDefault();
+
+        if (!checkTaskFields()) {
+            return; // শুধু থামবে
+        }
+        let payload = {
+            title:          $('.tasks_title').val(),
+            start_date:     $('.start_datess').val(),
+            short:          $('.short_details').val(),
+            note:           $('.tasks_notes').val(),
+            end_date:       $('.end_datess').val(),
+            user_id:        $('.user_selected_idd option:selected').val(),
+            priority:       $('.priority_selecteds option:selected').val(),
+            status:         $('.selected_status_opt option:selected').val(),
+            tag:            $('.tag_type_here').val(),
+            description:    $('.task_description_typings').val(),
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/tasks/store",
+            data: payload,
+            dataType: "json",
+            success: function (res) {
+                console.log(res);
+                $('#addTaskModal').modal('hide');
+                alert(res.message ?? 'Task saved!');
+                get_tasks_data_info();
+            },
+            error: function (xhr) {
+                console.log("Status:", xhr.status);
+                console.log("Response:", xhr.responseText);
+
+                // Laravel validation error হলে
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    alert(Object.values(errors).flat().join("\n"));
+                }
+            }
+        });
+
+
+    });
+
+    function checkTaskFields() {
+        let fields = [
+            'tasks_title',
+            'start_datess',
+            'end_datess',
+            'user_selected_idd option:selected',
+            'priority_selecteds option:selected',
+            'selected_status_opt option:selected',
+            'tag_type_here',
+            'task_description_typings',
+            'short_details',
+            'tasks_notes'
+        ];
+
+        let isValid = true;
+
+        fields.forEach(function (cls) {
+            let value = $('.' + cls).val();
+
+            if (!value || value.trim() === '') {
+                isValid = false;
+                $('.' + cls).addClass('is-invalid'); // optional UI
+            } else {
+                $('.' + cls).removeClass('is-invalid');
+            }
+        });
+        if (!isValid) $('.is-invalid:first').focus();
+
+        return isValid;
+    }
+
+    function resetTaskFields() {
+
+        let allFields = [
+            'tasks_title',
+            'start_datess',
+            'end_datess',
+            'user_selected_idd',
+            'priority_selecteds',
+            'selected_status_opt',
+            'tag_type_here',
+            'task_description_typings'
+        ];
+
+        allFields.forEach(cls => {
+            let el = $('.' + cls);
+
+            if (el.is('select')) {
+                el.val('').trigger('change');   // select reset
+            } else {
+                el.val('');                     // input / textarea reset
+            }
+
+            el.removeClass('is-invalid');       // validation clear
+        });
+    }
 
 
 
