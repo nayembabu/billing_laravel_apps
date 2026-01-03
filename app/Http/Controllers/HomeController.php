@@ -665,4 +665,48 @@ class HomeController extends Controller
         ]);
     }
 
+    public function update_tasks(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'task_id' => 'required|integer',
+            'type'    => 'required|in:status,priority',
+            'value'   => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'status'  => 0,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $task = Tasks::find($request->task_id);
+
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task not found',
+                'status'  => 0
+            ], 404);
+        }
+
+        // 🔥 Dynamic update
+        if ($request->type === 'status') {
+            $task->status = $request->value;
+        }
+
+        if ($request->type === 'priority') {
+            $task->priority = $request->value;
+        }
+
+        $task->save();
+
+        return response()->json([
+            'message' => ucfirst($request->type) . ' updated successfully',
+            'status'  => 1,
+            'task'    => $task
+        ]);
+    }
+
+
 }

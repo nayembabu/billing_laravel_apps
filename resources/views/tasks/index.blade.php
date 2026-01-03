@@ -97,14 +97,14 @@
                 <div class="row mb-4">
                     <div class="col"><h4 class="mb-0 font-weight-bold" style="color:#4e5154;">Tasks <small class="text-primary ml-2" style="font-size: 12px; cursor: pointer; font-weight: 400;">Tasks Overview →</small></h4></div>
                 </div>
-
+<!--
                 <div class="row mb-4 no-gutters">
                     <div class="col px-1"><div class="card-summary"><span class="summary-count">13</span> <span class="summary-label">Not Started</span><span class="summary-subtext">My Tasks: 8</span></div></div>
                     <div class="col px-1"><div class="card-summary"><span class="summary-count text-primary">11</span> <span class="summary-label text-primary">In Progress</span><span class="summary-subtext">My Tasks: 4</span></div></div>
                     <div class="col px-1"><div class="card-summary"><span class="summary-count">7</span> <span class="summary-label">Testing</span><span class="summary-subtext">My Tasks: 2</span></div></div>
                     <div class="col px-1"><div class="card-summary"><span class="summary-count">13</span> <span class="summary-label">Awaiting Feedback</span><span class="summary-subtext">My Tasks: 5</span></div></div>
                     <div class="col px-1"><div class="card-summary"><span class="summary-count">19</span> <span class="summary-label">Complete</span><span class="summary-subtext">My Tasks: 11</span></div></div>
-                </div>
+                </div> -->
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-3">
@@ -324,7 +324,7 @@ $(document).ready(function() {
                                             <small class="text-muted">=> ${res[n].note || ''}</small>
                                         </td>
                                         <td>
-                                            <select class="status-dropdown-btn " data-toggle="dropdown" >
+                                            <select class="status-dropdown-btn change_status_options " tasks_idd="${res[n].id}" data-toggle="dropdown" >
                                                 <option value="1" ${res[n].status == 1 ? 'selected' : ''} class="dropdown-item">In Progress</option>
                                                 <option value="2" ${res[n].status == 2 ? 'selected' : ''} class="dropdown-item">Mark as Not Started</option>
                                                 <option value="3" ${res[n].status == 3 ? 'selected' : ''} class="dropdown-item">Mark as Testing</option>
@@ -337,7 +337,7 @@ $(document).ready(function() {
                                         <td>${res[n].user.name}</td>
                                         <td>
                                             <div class="dropdown">
-                                                <select class="priority-dropdown-link" data-toggle="dropdown">
+                                                <select class="priority-dropdown-link task_priority_changeable " task_id_au="${res[n].id}" data-toggle="dropdown">
                                                     <option  value="1" ${res[n].priority == 1 ? 'selected' : ''}  class="dropdown-item" >Low</option>
                                                     <option  value="2" ${res[n].priority == 2 ? 'selected' : ''}  class="dropdown-item" >Medium</option>
                                                     <option  value="3" ${res[n].priority == 3 ? 'selected' : ''}  class="dropdown-item" >High</option>
@@ -502,7 +502,55 @@ $(document).ready(function() {
         });
     }
 
+    $(document).on('change', '.change_status_options', function () {
+        let task_id = $(this).attr('tasks_idd');
+        let this_status_val = $(this).find('option:selected').val();
 
+        $.ajax({
+            type: "post",
+            url: "/tasks/update",
+            data: {
+                task_id: task_id,
+                type: 'status',
+                value: this_status_val
+            },
+            success: function (rs) {
+                alert(rs.message ?? 'Task Update!');
+                get_tasks_data_info();
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    alert(Object.values(errors).flat().join("\n"));
+                }
+            }
+        });
+    });
+
+    $(document).on('change', '.task_priority_changeable', function () {
+        let task_id = $(this).attr('task_id_au');
+        let this_status_val = $(this).find('option:selected').val();
+
+        $.ajax({
+            type: "post",
+            url: "/tasks/update",
+            data: {
+                task_id: task_id,
+                type: 'priority',
+                value: this_status_val
+            },
+            success: function (rs) {
+                alert(rs.message ?? 'Task Update!');
+                get_tasks_data_info();
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    alert(Object.values(errors).flat().join("\n"));
+                }
+            }
+        });
+    });
 
 
 

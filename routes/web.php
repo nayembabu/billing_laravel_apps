@@ -321,6 +321,7 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('/tasks', 'HomeController@tasks_view_file')->name('task_view');
 	Route::get('/task-get_data', 'HomeController@tasks_view_fileget_tasks_data_api')->name('task.get_data');
 	Route::post('/tasks/store', 'HomeController@task_store_entry')->name('task.store');
+	Route::post('/tasks/update', 'HomeController@update_tasks')->name('task.update');
 
 
 
