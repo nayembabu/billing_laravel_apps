@@ -322,8 +322,8 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('/task-get_data', 'HomeController@tasks_view_fileget_tasks_data_api')->name('task.get_data');
 	Route::post('/tasks/store', 'HomeController@task_store_entry')->name('task.store');
 	Route::post('/tasks/update', 'HomeController@update_tasks')->name('task.update');
-
-
+	Route::get('/crm', 'CustomerController@send_sms_view_file')->name('crm.index');
+	Route::get('/crm/get_customer', 'CustomerController@get_all_customer')->name('crm.get_customer');
 
 	Route::get('my-transactions/{year}/{month}', 'HomeController@myTransaction');
 });

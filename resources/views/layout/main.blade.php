@@ -303,6 +303,13 @@
             </li>
             @endif
 
+            <li><a href="#crm-list" aria-expanded="true" data-toggle="collapse" class=""> <i class="dripicons-network-3"></i><span>CRM</span></a>
+                <ul id="crm-list" class="list-unstyled collapse show" style="">
+                    <li id="exp-cat-menu" class=""><a href="{{ route('crm.index') }}">Send SMS</a>
+                    </li>
+                </ul>
+            </li>
+
             <?php
             $index_permission_active = DB::table('permissions')
                 ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')

@@ -161,7 +161,7 @@ class CustomerController extends Controller
             Supplier::create($lims_customer_data);
             $message .= ' and Supplier';
         }
-        
+
         if($lims_customer_data['email']) {
             try{
                 Mail::send( 'mail.customer_create', $lims_customer_data, function( $message ) use ($lims_customer_data)
@@ -171,7 +171,7 @@ class CustomerController extends Controller
             }
             catch(\Exception $e){
                 $message .= ' created successfully. Please setup your <a href="setting/mail_setting">mail setting</a> to send mail.';
-            }   
+            }
         }
         else
             $message .= ' created successfully!';
@@ -238,7 +238,7 @@ class CustomerController extends Controller
         else {
             $message = 'Customer updated successfully';
         }
-        
+
         $input['name'] = $input['customer_name'];
         $lims_customer_data->update($input);
         return redirect('customer')->with('edit_message', $message);
@@ -398,4 +398,23 @@ class CustomerController extends Controller
         $lims_customer_data->save();
         return redirect('customer')->with('not_permitted','Data deleted Successfully');
     }
+
+    public function send_sms_view_file()
+    {
+        $customers_data = Customer::get();
+        return view('customer.crm_view', compact('customers_data'));
+    }
+
+    public function get_all_customer()
+    {
+        $customers_data = Customer::get();
+
+        return response()->json([
+            'message'       => 'data find successfully',
+            'status'        => 1,
+            'allCustomer'   => $customers_data
+        ]);
+    }
+
+
 }
