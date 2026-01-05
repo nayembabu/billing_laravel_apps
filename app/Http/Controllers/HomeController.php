@@ -620,7 +620,9 @@ class HomeController extends Controller
 
     public function tasks_view_fileget_tasks_data_api()
     {
-        $data['tasks'] = Tasks::with('user')->get();
+        $data['tasks'] = Tasks::with('user')
+                                ->where('activity', 1)
+                                ->get();
         return $data;
     }
 
@@ -706,6 +708,45 @@ class HomeController extends Controller
             'status'  => 1,
             'task'    => $task
         ]);
+    }
+
+    public function delete_this_tasks(Request $request)
+    {
+
+        $task = Tasks::find($request->id);
+
+        if (!$task) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Task not found'
+            ], 404);
+        }
+
+        $task->activity = 0;
+        $task->save();
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Task successfully deleted'
+        ]);
+    }
+
+    public function find_this_task_by_id(Request $request)
+    {
+        $task = Tasks::find($request->id);
+
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task not found',
+                'status'  => 0
+            ], 404);
+        }
+        return response()->json([
+            'message' => 'Find Successfully',
+            'status'  => 1,
+            'task'    => $task
+        ]);
+
     }
 
 

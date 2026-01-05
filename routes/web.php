@@ -318,10 +318,16 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::post('/change-currency', [CurrencyController::class, 'changeCurrency'])->name('change-currency');
 
 	Route::get('/home', 'HomeController@index')->name('home');
+
+
 	Route::get('/tasks', 'HomeController@tasks_view_file')->name('task_view');
 	Route::get('/task-get_data', 'HomeController@tasks_view_fileget_tasks_data_api')->name('task.get_data');
 	Route::post('/tasks/store', 'HomeController@task_store_entry')->name('task.store');
 	Route::post('/tasks/update', 'HomeController@update_tasks')->name('task.update');
+	Route::post('/tasks/delete', 'HomeController@delete_this_tasks')->name('task.delete');
+	Route::post('/tasks/find_single', 'HomeController@find_this_task_by_id')->name('task.find_single');
+
+
 	Route::get('/crm', 'CustomerController@send_sms_view_file')->name('crm.index');
 	Route::get('/crm/get_customer', 'CustomerController@get_all_customer')->name('crm.get_customer');
 
