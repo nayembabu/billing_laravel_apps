@@ -326,10 +326,13 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::post('/tasks/update', 'HomeController@update_tasks')->name('task.update');
 	Route::post('/tasks/delete', 'HomeController@delete_this_tasks')->name('task.delete');
 	Route::post('/tasks/find_single', 'HomeController@find_this_task_by_id')->name('task.find_single');
+	Route::post('/tasks/updateAll', 'HomeController@updateAll')->name('task.update');
 
 
 	Route::get('/crm', 'CustomerController@send_sms_view_file')->name('crm.index');
 	Route::get('/crm/get_customer', 'CustomerController@get_all_customer')->name('crm.get_customer');
+    Route::get('/crm/filter', 'CustomerController@filterCustomers')->name('crm.filter');
+    Route::post('/send-sms', 'CustomerController@sendSms')->name('sms.send');
 
 	Route::get('my-transactions/{year}/{month}', 'HomeController@myTransaction');
 });

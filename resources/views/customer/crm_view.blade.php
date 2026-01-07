@@ -13,6 +13,19 @@
             <input type="text" id="searchInput" class="form-control" placeholder="Search by name or mobile number">
         </div>
 
+
+
+        <!-- Filter Buttons -->
+        <div class="d-flex justify-content-center mb-3">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-filter="all">ALL</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="7">Last 7 Days</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="30">Last 30 Days</button>
+            </div>
+        </div>
+
+
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -21,6 +34,7 @@
                     </th>
                     <th>Name</th>
                     <th>Mobile Number</th>
+                    <th>Last Purchase</th>
                     <th>Address</th>
                 </tr>
             </thead>
@@ -71,28 +85,28 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        const itemsPerPage = 10;
-        let currentPage = 1;
         let allCustomers = [];
         let filteredCustomers = allCustomers;
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
-        function fetchCustomers(){
+        function fetchCustomers(filter = 'all'){
             $.ajax({
-                url: '/crm/get_customer',
-                method: 'GET',
-                dataType: 'json'
+                url: "{{ route('crm.filter') }}",
+                method: "GET",
+                data: { filter: filter },
+                dataType: "json"
             }).done(function(res){
-                console.log(res);
-                // API returns allCustomer array inside response
                 const data = res.allCustomer || res.data || res;
+
                 allCustomers = (Array.isArray(data) ? data : []).map(c => ({
                     id: c.id || null,
                     name: c.name || '',
-                    mobile: (c.phone_number || c.phone || c.mobile || '').toString(),
+                    mobile: (c.phone_number || c.phone_number || c.phone_number || '').toString(),
+                    last_purchase: c.last_purchase_date || '',
                     address: c.address || ''
                 }));
                 filteredCustomers = allCustomers;
-                currentPage = 1;
                 renderTable();
             }).fail(function(){
                 alert('Failed to load customers.');
@@ -102,35 +116,19 @@
 
 
         function renderTable() {
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageData = filteredCustomers.slice(start, end);
 
             let html = '';
-            pageData.forEach(customer => {
+            filteredCustomers.forEach(customer => {
                 html += `<tr>
                     <td><input type="checkbox" class="customerCheckbox" data-mobile="${customer.mobile}"></td>
                     <td>${customer.name}</td>
                     <td>${customer.mobile}</td>
+                    <td>${customer.last_purchase}</td>
                     <td>${customer.address}</td>
                 </tr>`;
             });
 
             $('#tableBody').html(html);
-            renderPagination();
-        }
-
-        function renderPagination() {
-            const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-            let paginationHtml = '';
-
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" data-page="${i}">${i}</a>
-                </li>`;
-            }
-
-            $('#pagination').html(paginationHtml);
         }
 
         $('#searchInput').on('keyup', function(){
@@ -165,18 +163,36 @@
             }
 
             $('#mobileNumbers').val(mobiles.join(', '));
-            new bootstrap.Modal(document.getElementById('smsModal')).show();
+            $('#smsModal').modal('show');
         });
 
         $('#submitSmsBtn').on('click', function(){
             let message = $('#smsMessage').val();
+            let mobileNumbers = $('#mobileNumbers').val();
+
             if(message.trim() === ''){
                 alert('Please enter a message');
                 return;
             }
-            alert('SMS sent successfully!');
-            new bootstrap.Modal(document.getElementById('smsModal')).hide();
+
+            $.ajax({
+                url: "{{ route('sms.send') }}",
+                type: 'POST',
+                data: {
+                    message: message,
+                    mobile_numbers: mobileNumbers
+                },
+                success: function(res){
+                    alert(res.message);
+                    $('#smsModal').modal('hide');
+                },
+                error: function(err){
+                    alert('Something went wrong!');
+                    console.log(err);
+                }
+            });
         });
+
 
         $.ajaxSetup({
             headers: {
@@ -185,6 +201,28 @@
         });
 
         fetchCustomers();
+
+        // Filter Buttons Click
+        $('.btn-group .btn').click(function(){
+            $('.btn-group .btn').removeClass('active');
+            $(this).addClass('active');
+
+            let filter = $(this).data('filter');
+            fetchCustomers(filter);
+        });
+
+            // document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            //     btn.addEventListener('click', function () {
+            //         document.querySelectorAll('.btn-group .btn')
+            //             .forEach(b => b.classList.remove('active'));
+            //         this.classList.add('active');
+
+            //         let filter = $(this).data('filter');
+            //         fetchCustomers(filter);
+            //     });
+            // });
     });
 </script>
 @endpush
+
+

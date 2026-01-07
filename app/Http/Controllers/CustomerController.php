@@ -19,6 +19,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Mail\UserNotification;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -407,12 +408,61 @@ class CustomerController extends Controller
 
     public function get_all_customer()
     {
-        $customers_data = Customer::get();
-
+        $customers_data = Customer::withMax('sales', 'created_at')->get();
         return response()->json([
             'message'       => 'data find successfully',
             'status'        => 1,
             'allCustomer'   => $customers_data
+        ]);
+    }
+
+    public function filterCustomers(Request $request)
+    {
+        $filter = $request->filter ?? 'all';
+
+        $query = Customer::leftJoin('sales', 'customers.id', '=', 'sales.customer_id')
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.address',
+                \DB::raw('MAX(sales.created_at) as last_purchase_date')
+            )
+            ->groupBy('customers.id');
+
+        if ($filter === '7') {
+            $query->having('last_purchase_date', '<=', Carbon::now()->subDays(7));
+        } elseif ($filter === '30') {
+            $query->having('last_purchase_date', '<=', Carbon::now()->subDays(30));
+        }
+
+        $customers = $query->get();
+
+        // Return JSON for AJAX
+        return response()->json([
+            'message'       => 'data find successfully',
+            'status'        => 1,
+            'allCustomer'   => $customers
+        ]);
+    }
+
+
+    public function sendSms(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string',
+            'mobile_numbers' => 'required|string',
+        ]);
+
+        $message = $request->message;
+        $mobileNumbers = explode(',', $request->mobile_numbers);
+
+        // এখানে তোমার SMS sending logic
+        // Example: foreach($mobileNumbers as $number) { sendSms($number, $message); }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'SMS sent successfully!',
         ]);
     }
 

@@ -160,6 +160,69 @@
     .is-invalid {
         border: 1px solid red;
     }
+    .editModalWrap { border-radius: 16px; overflow: hidden; }
+    .editModalHeader{
+        background: linear-gradient(135deg, #111827, #0f766e);
+        color: #fff;
+    }
+    .editModalTitle{ font-weight: 800; font-size: 18px; letter-spacing: .2px; }
+    .editModalSub{ font-size: 12px; opacity: .85; margin-top: 2px; }
+
+    .editLeftPanel{
+        background: #0b1220;
+        color: #e5e7eb;
+        min-height: 100%;
+    }
+    .editRightPanel{
+        background: #ffffff;
+    }
+
+    .miniCard{
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 14px;
+        padding: 14px;
+    }
+    .miniLabel{ font-size: 11px; opacity: .75; margin-bottom: 4px; }
+    .miniValue{ font-size: 14px; font-weight: 700; color: #fff; }
+    .miniHint{
+        margin-top: 14px;
+        font-size: 12px;
+        opacity: .8;
+        line-height: 1.5;
+    }
+
+    .niceInput{
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: .55rem .75rem;
+    }
+    .niceInput:focus{
+        border-color: #0f766e;
+        box-shadow: 0 0 0 .15rem rgba(15,118,110,.15);
+    }
+    .niceTextarea{
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        padding: .75rem;
+    }
+    .formRow2{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .formRow3{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }
+    @media (max-width: 992px){
+        .formRow2, .formRow3 { grid-template-columns: 1fr; }
+    }
+    .editModalFooter{
+        background: #f9fafb;
+    }
+
 </style>
 @if(session()->has('not_permitted'))
 <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
@@ -256,12 +319,14 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-3">
-                        <div>
-                            <button class="btn btn-dark btn-sm px-3" data-toggle="modal" data-target="#addTaskModal">
-                                <i class="fas fa-plus mr-1"></i>
-                                New Task
-                            </button>
-                        </div>
+                        @if(Auth::user()->role_id == 1)
+                            <div>
+                                <button class="btn btn-dark btn-sm px-3" data-toggle="modal" data-target="#addTaskModal">
+                                    <i class="fas fa-plus mr-1"></i>
+                                    New Task
+                                </button>
+                            </div>
+                        @endif
                         <div class="d-flex">
                             <div class="input-group input-group-sm mr-2" style="width: 200px;">
                                 <div class="input-group-prepend">
@@ -302,25 +367,36 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
         </div>
 
 
-        <!-- View and Edit Task -->
-        <div class="modal fade" id="view_and_edit_task" tabindex="-1" role="dialog" aria-labelledby="view_and_edit_taskTitle" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="view_and_edit_taskTitle"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body view_task_modal "></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+            <!-- View and Edit Task -->
+            <div class="modal fade" id="view_and_edit_task" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                    <div class="modal-content border-0 editModalWrap">
+                        <div class="modal-header border-0 px-4 py-3 editModalHeader">
+                            <div>
+                                <div class="editModalTitle" id="view_and_edit_taskTitle" ></div>
+                                <div class="editModalSub" id="view_and_edit_taskDesc" ></div>
+                            </div>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="modal-body p-0 modalBodyEditTaskData "></div>
+
+                        @if(Auth::user()->role_id == 1)
+                            <div class="modal-footer border-0 px-4 py-3 editModalFooter">
+                                <button type="button" class="btn btn-light btn-sm px-4" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-dark btn-sm px-4 update_task_btn">Update Task</button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- View and Edit Task -->
+            <!-- View and Edit Task -->
+
+
+
 
         <!-- Add New Task Modal -->
         <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -490,297 +566,450 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 </section>
 @endsection
 
+
 @push('scripts')
-<script type="text/javascript">
+@if(Auth::user()->role_id == 1)
+    <script type="text/javascript">
 
 
 
-    $(document).ready(function () {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
 
-        get_tasks_data_info();
+            get_tasks_data_info();
 
-        function get_tasks_data_info() {
-            $.ajax({
-                type: "get",
-                url: "task-get_data",
-                data: "",
-                dataType: "json",
-                success: function (resp) {
-                    let res = resp.tasks;
+            function get_tasks_data_info() {
+                $.ajax({
+                    type: "get",
+                    url: "task-get_data",
+                    data: "",
+                    dataType: "json",
+                    success: function (resp) {
+                        let res = resp.tasks;
 
-                    let statusCount = {
-                        1: 0,
-                        2: 0,
-                        3: 0,
-                        4: 0,
-                        5: 0
-                    };
+                        let statusCount = {
+                            1: 0,
+                            2: 0,
+                            3: 0,
+                            4: 0,
+                            5: 0
+                        };
 
-                    let data_html = '';
-                    for (let n = 0; n < res.length; n++) {
-                        statusCount[res[n].status]++;
-                        data_html += `<tr>
-                                        <td>${n + 1}</td>
-                                        <td>
-                                            <div class="task-name text-dark font-weight-bold d-block task_view_btn " task_id="${res[n].id}" style="cursor: pointer;" >${res[n].title}</div>
-                                            <small class="text-muted">${res[n].short_title || ''},</small>
-                                            <small class="text-muted">=> ${res[n].note || ''}</small>
+                        let data_html = '';
+                        for (let n = 0; n < res.length; n++) {
+                            statusCount[res[n].status]++;
+                            data_html += `<tr>
+                                            <td>${n + 1}</td>
+                                            <td>
+                                                <div class="task-name text-dark font-weight-bold d-block task_view_btn " task_id="${res[n].id}" style="cursor: pointer;" >${res[n].title}</div>
+                                                <small class="text-muted">${res[n].short_title || ''},</small>
+                                                <small class="text-muted">=> ${res[n].note || ''}</small>
 
-                                            <div class="row-options">
-                                                <a style="cursor: pointer; " task_id="${res[n].id}" class="text-success task_view_btn">View </a>
-                                                <a style="cursor: pointer; margin-left: 10px;" task_id="${res[n].id}" class="text-danger _delete_task task-delete">Delete </a>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <select class="status-dropdown-btn change_status_options " tasks_idd="${res[n].id}" data-toggle="dropdown" >
-                                                <option value="1" ${res[n].status == 1 ? 'selected' : ''} class="dropdown-item">In Progress</option>
-                                                <option value="2" ${res[n].status == 2 ? 'selected' : ''} class="dropdown-item">Mark as Not Started</option>
-                                                <option value="3" ${res[n].status == 3 ? 'selected' : ''} class="dropdown-item">Mark as Testing</option>
-                                                <option value="4" ${res[n].status == 4 ? 'selected' : ''} class="dropdown-item">Mark as Awaiting Feedback</option>
-                                                <option value="5" ${res[n].status == 5 ? 'selected' : ''} class="dropdown-item">Mark as Complete</option>
-                                            </select>
-                                        </td>
-                                        <td>${res[n].start_date}</td>
-                                        <td>${res[n].due_date}</td>
-                                        <td>${res[n].user.name}</td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <select class="priority-dropdown-link task_priority_changeable " task_id_au="${res[n].id}" data-toggle="dropdown">
-                                                    <option  value="1" ${res[n].priority == 1 ? 'selected' : ''}  class="dropdown-item" >Low</option>
-                                                    <option  value="2" ${res[n].priority == 2 ? 'selected' : ''}  class="dropdown-item" >Medium</option>
-                                                    <option  value="3" ${res[n].priority == 3 ? 'selected' : ''}  class="dropdown-item" >High</option>
-                                                    <option  value="4" ${res[n].priority == 4 ? 'selected' : ''}  class="dropdown-item" >Urgent</option>
+                                                <div class="row-options">
+                                                    <a style="cursor: pointer; " task_id="${res[n].id}" class="text-success task_view_btn">View </a>
+                                                    <a style="cursor: pointer; margin-left: 10px;" task_id="${res[n].id}" class="text-danger _delete_task task-delete">Delete </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <select class="status-dropdown-btn change_status_options " tasks_idd="${res[n].id}" data-toggle="dropdown" >
+                                                    <option value="1" ${res[n].status == 1 ? 'selected' : ''} class="dropdown-item">In Progress</option>
+                                                    <option value="2" ${res[n].status == 2 ? 'selected' : ''} class="dropdown-item">Mark as Not Started</option>
+                                                    <option value="3" ${res[n].status == 3 ? 'selected' : ''} class="dropdown-item">Mark as Testing</option>
+                                                    <option value="4" ${res[n].status == 4 ? 'selected' : ''} class="dropdown-item">Mark as Awaiting Feedback</option>
+                                                    <option value="5" ${res[n].status == 5 ? 'selected' : ''} class="dropdown-item">Mark as Complete</option>
                                                 </select>
-                                            </div>
-                                        </td>
-                                    </tr> `
-                    }
-                    $('.data_assigning').html(data_html);
-                    $(".card_11").text(statusCount[1]);
-                    $(".card_21").text(statusCount[2]);
-                    $(".card_31").text(statusCount[3]);
-                    $(".card_41").text(statusCount[4]);
-                    $(".card_51").text(statusCount[5]);
-
-                    const rowsPerPage = 5;
-                    let currentPage = 1;
-                    const $tableBody = $('.table-tasks tbody');
-                    const $rows = $tableBody.find('tr');
-
-                    function showPage(page, rowsToDisplay) {
-                        const start = (page - 1) * rowsPerPage;
-                        const end = start + rowsPerPage;
-                        rowsToDisplay.hide();
-                        const visibleRows = rowsToDisplay.slice(start, end);
-                        visibleRows.show();
-
-                        const total = rowsToDisplay.length;
-                        const currentEnd = end > total ? total : end;
-                        $('#tableInfo').text(total > 0 ? `Showing ${start + 1} to ${currentEnd} of ${total} entries` : "No entries found");
-                    }
-
-                    function initPagination(rowsToPaginate) {
-                        const pageCount = Math.ceil(rowsToPaginate.length / rowsPerPage);
-                        const $controls = $('#paginationControls');
-                        $controls.empty();
-                        for (let i = 1; i <= pageCount; i++) {
-                            const $li = $(`<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`);
-                            $li.click(function (e) {
-                                e.preventDefault();
-                                currentPage = i;
-                                showPage(currentPage, rowsToPaginate);
-                                $(this).addClass('active').siblings().removeClass('active');
-                            });
-                            $controls.append($li);
+                                            </td>
+                                            <td>${res[n].start_date}</td>
+                                            <td>${res[n].due_date}</td>
+                                            <td>${res[n].user.name}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <select class="priority-dropdown-link task_priority_changeable " task_id_au="${res[n].id}" data-toggle="dropdown">
+                                                        <option  value="1" ${res[n].priority == 1 ? 'selected' : ''}  class="dropdown-item" >Low</option>
+                                                        <option  value="2" ${res[n].priority == 2 ? 'selected' : ''}  class="dropdown-item" >Medium</option>
+                                                        <option  value="3" ${res[n].priority == 3 ? 'selected' : ''}  class="dropdown-item" >High</option>
+                                                        <option  value="4" ${res[n].priority == 4 ? 'selected' : ''}  class="dropdown-item" >Urgent</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr> `
                         }
-                        showPage(1, rowsToPaginate);
-                    }
+                        $('.data_assigning').html(data_html);
+                        $(".card_11").text(statusCount[1]);
+                        $(".card_21").text(statusCount[2]);
+                        $(".card_31").text(statusCount[3]);
+                        $(".card_41").text(statusCount[4]);
+                        $(".card_51").text(statusCount[5]);
 
-                    $('#taskSearch').on('keyup', function () {
-                        const value = $(this).val().toLowerCase();
-                        const filteredRows = $rows.filter(function () {
-                            return $(this).text().toLowerCase().indexOf(value) > -1;
+                        const rowsPerPage = 5;
+                        let currentPage = 1;
+                        const $tableBody = $('.table-tasks tbody');
+                        const $rows = $tableBody.find('tr');
+
+                        function showPage(page, rowsToDisplay) {
+                            const start = (page - 1) * rowsPerPage;
+                            const end = start + rowsPerPage;
+                            rowsToDisplay.hide();
+                            const visibleRows = rowsToDisplay.slice(start, end);
+                            visibleRows.show();
+
+                            const total = rowsToDisplay.length;
+                            const currentEnd = end > total ? total : end;
+                            $('#tableInfo').text(total > 0 ? `Showing ${start + 1} to ${currentEnd} of ${total} entries` : "No entries found");
+                        }
+
+                        function initPagination(rowsToPaginate) {
+                            const pageCount = Math.ceil(rowsToPaginate.length / rowsPerPage);
+                            const $controls = $('#paginationControls');
+                            $controls.empty();
+                            for (let i = 1; i <= pageCount; i++) {
+                                const $li = $(`<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`);
+                                $li.click(function (e) {
+                                    e.preventDefault();
+                                    currentPage = i;
+                                    showPage(currentPage, rowsToPaginate);
+                                    $(this).addClass('active').siblings().removeClass('active');
+                                });
+                                $controls.append($li);
+                            }
+                            showPage(1, rowsToPaginate);
+                        }
+
+                        $('#taskSearch').on('keyup', function () {
+                            const value = $(this).val().toLowerCase();
+                            const filteredRows = $rows.filter(function () {
+                                return $(this).text().toLowerCase().indexOf(value) > -1;
+                            });
+                            $rows.hide();
+                            initPagination(filteredRows);
                         });
-                        $rows.hide();
-                        initPagination(filteredRows);
-                    });
 
-                    initPagination($rows);
+                        initPagination($rows);
 
-                }
-            });
-        }
-
-        $(document).on('click', '.entry_new_task_btn', function (e) {
-            e.preventDefault();
-
-            if (!checkTaskFields()) {
-                return; // শুধু থামবে
+                    }
+                });
             }
-            let payload = {
-                title:          $('.tasks_title').val(),
-                start_date:     $('.start_datess').val(),
-                short:          $('.short_details').val(),
-                note:           $('.tasks_notes').val(),
-                end_date:       $('.end_datess').val(),
-                user_id:        $('.user_selected_idd option:selected').val(),
-                priority:       $('.priority_selecteds option:selected').val(),
-                status:         $('.selected_status_opt option:selected').val(),
-                tag:            $('.tag_type_here').val(),
-                description:    $('.task_description_typings').val(),
-            };
 
-            $.ajax({
-                type: "POST",
-                url: "/tasks/store",
-                data: payload,
-                dataType: "json",
-                success: function (res) {
-                    console.log(res);
-                    $('#addTaskModal').modal('hide');
-                    alert(res.message ?? 'Task saved!');
-                    get_tasks_data_info();
-                },
-                error: function (xhr) {
-                    console.log("Status:", xhr.status);
-                    console.log("Response:", xhr.responseText);
+            $(document).on('click', '.entry_new_task_btn', function (e) {
+                e.preventDefault();
 
-                    // Laravel validation error হলে
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        alert(Object.values(errors).flat().join("\n"));
+                if (!checkTaskFields()) {
+                    return;
+                }
+                let payload = {
+                    title:          $('.tasks_title').val(),
+                    start_date:     $('.start_datess').val(),
+                    short:          $('.short_details').val(),
+                    note:           $('.tasks_notes').val(),
+                    end_date:       $('.end_datess').val(),
+                    user_id:        $('.user_selected_idd option:selected').val(),
+                    priority:       $('.priority_selecteds option:selected').val(),
+                    status:         $('.selected_status_opt option:selected').val(),
+                    tag:            $('.tag_type_here').val(),
+                    description:    $('.task_description_typings').val(),
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/tasks/store",
+                    data: payload,
+                    dataType: "json",
+                    success: function (res) {
+                        console.log(res);
+                        $('#addTaskModal').modal('hide');
+                        alert(res.message ?? 'Task saved!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        console.log("Status:", xhr.status);
+                        console.log("Response:", xhr.responseText);
+
+                        // Laravel validation error হলে
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
                     }
-                }
+                });
             });
 
+            function checkTaskFields() {
+                let fields = [
+                    'tasks_title',
+                    'start_datess',
+                    'end_datess',
+                    'user_selected_idd option:selected',
+                    'priority_selecteds option:selected',
+                    'selected_status_opt option:selected',
+                    'tag_type_here',
+                    'task_description_typings',
+                    'short_details',
+                    'tasks_notes'
+                ];
 
-        });
+                let isValid = true;
 
-        function checkTaskFields() {
-            let fields = [
-                'tasks_title',
-                'start_datess',
-                'end_datess',
-                'user_selected_idd option:selected',
-                'priority_selecteds option:selected',
-                'selected_status_opt option:selected',
-                'tag_type_here',
-                'task_description_typings',
-                'short_details',
-                'tasks_notes'
-            ];
+                fields.forEach(function (cls) {
+                    let value = $('.' + cls).val();
 
-            let isValid = true;
-
-            fields.forEach(function (cls) {
-                let value = $('.' + cls).val();
-
-                if (!value || value.trim() === '') {
-                    isValid = false;
-                    $('.' + cls).addClass('is-invalid'); // optional UI
-                } else {
-                    $('.' + cls).removeClass('is-invalid');
-                }
-            });
-            if (!isValid) $('.is-invalid:first').focus();
-
-            return isValid;
-        }
-
-        function resetTaskFields() {
-
-            let allFields = [
-                'tasks_title',
-                'start_datess',
-                'end_datess',
-                'user_selected_idd',
-                'priority_selecteds',
-                'selected_status_opt',
-                'tag_type_here',
-                'task_description_typings'
-            ];
-
-            allFields.forEach(cls => {
-                let el = $('.' + cls);
-
-                if (el.is('select')) {
-                    el.val('').trigger('change');   // select reset
-                } else {
-                    el.val('');                     // input / textarea reset
-                }
-
-                el.removeClass('is-invalid');       // validation clear
-            });
-        }
-
-        $(document).on('change', '.change_status_options', function () {
-            let task_id = $(this).attr('tasks_idd');
-            let this_status_val = $(this).find('option:selected').val();
-
-            $.ajax({
-                type: "post",
-                url: "/tasks/update",
-                data: {
-                    task_id: task_id,
-                    type: 'status',
-                    value: this_status_val
-                },
-                success: function (rs) {
-                    alert(rs.message ?? 'Task Update!');
-                    get_tasks_data_info();
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        alert(Object.values(errors).flat().join("\n"));
+                    if (!value || value.trim() === '') {
+                        isValid = false;
+                        $('.' + cls).addClass('is-invalid');
+                    } else {
+                        $('.' + cls).removeClass('is-invalid');
                     }
-                }
-            });
-        });
+                });
+                if (!isValid) $('.is-invalid:first').focus();
+                return isValid;
+            }
 
-        $(document).on('change', '.task_priority_changeable', function () {
-            let task_id = $(this).attr('task_id_au');
-            let this_status_val = $(this).find('option:selected').val();
+            function resetTaskFields() {
 
-            $.ajax({
-                type: "post",
-                url: "/tasks/update",
-                data: {
-                    task_id: task_id,
-                    type: 'priority',
-                    value: this_status_val
-                },
-                success: function (rs) {
-                    alert(rs.message ?? 'Task Update!');
-                    get_tasks_data_info();
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        alert(Object.values(errors).flat().join("\n"));
+                let allFields = [
+                    'tasks_title',
+                    'start_datess',
+                    'end_datess',
+                    'user_selected_idd',
+                    'priority_selecteds',
+                    'selected_status_opt',
+                    'tag_type_here',
+                    'task_description_typings'
+                ];
+
+                allFields.forEach(cls => {
+                    let el = $('.' + cls);
+
+                    if (el.is('select')) {
+                        el.val('').trigger('change');
+                    } else {
+                        el.val('');
                     }
-                }
-            });
-        });
 
-        $(document).on('click', '._delete_task', function () {
-            let task_id = $(this).attr('task_id');
-            if (confirm('Are You sure to Delete? ')) {
+                    el.removeClass('is-invalid');
+                });
+            }
+
+            $(document).on('change', '.change_status_options', function () {
+                let task_id = $(this).attr('tasks_idd');
+                let this_status_val = $(this).find('option:selected').val();
+
                 $.ajax({
                     type: "post",
-                    url: "/tasks/delete",
+                    url: "/tasks/update",
+                    data: {
+                        task_id: task_id,
+                        type: 'status',
+                        value: this_status_val
+                    },
+                    success: function (rs) {
+                        alert(rs.message ?? 'Task Update!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+            $(document).on('change', '.task_priority_changeable', function () {
+                let task_id = $(this).attr('task_id_au');
+                let this_status_val = $(this).find('option:selected').val();
+
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/update",
+                    data: {
+                        task_id: task_id,
+                        type: 'priority',
+                        value: this_status_val
+                    },
+                    success: function (rs) {
+                        alert(rs.message ?? 'Task Update!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '._delete_task', function () {
+                let task_id = $(this).attr('task_id');
+                if (confirm('Are You sure to Delete? ')) {
+                    $.ajax({
+                        type: "post",
+                        url: "/tasks/delete",
+                        data: {
+                            id: task_id
+                        },
+                        success: function (rs) {
+                            alert(rs.message ?? 'Task Deleted!');
+                            get_tasks_data_info();
+                        },
+                        error: function (xhr) {
+                            if (xhr.status === 404) {
+                                let errors = xhr.responseJSON.errors;
+                                alert(Object.values(errors).flat().join("\n"));
+                            }
+                        }
+                    });
+                }
+            });
+
+            $(document).on('click', '.task_view_btn', function () {
+                let task_id = $(this).attr('task_id');
+
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/find_single",
                     data: {
                         id: task_id
                     },
-                    success: function (rs) {
-                        alert(rs.message ?? 'Task Deleted!');
-                        get_tasks_data_info();
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                    },
+                    dataType: "json",
+                    success: function (rss) {
+
+                        let priorityText = ({
+                            1: 'Low',
+                            2: 'Medium',
+                            3: 'High',
+                            4: 'Urgent'
+                        }[rss.task.priority]) || '';
+
+                        const statusConfig = {
+                            1: { text: 'In Progress', color: 'primary' },
+                            2: { text: 'Not Started', color: 'secondary' },
+                            3: { text: 'Testing', color: 'info' },
+                            4: { text: 'Awaiting Feedback', color: 'warning' },
+                            5: { text: 'Completed', color: 'success' }
+                        };
+                        let status = statusConfig[rss.task.status];
+                        let html = status ? `<span class="badge badge-${status.color}">${status.text}</span>` : '';
+
+
+                        $("#loader").css('display', 'none');
+                        $('#view_and_edit_taskTitle').text(rss.task.title);
+                        $('#view_and_edit_taskDesc').text(rss.task.short_title);
+                        // $('.view_task_modal').html(``);
+                        $('#view_and_edit_task').modal('show');
+
+                        $('.modalBodyEditTaskData').html(`
+                            <div id="editTaskForm">
+                                <input type="hidden" class="edit_task_id" value="${rss.task.id || ''}">
+                                <div class="row no-gutters">
+                                    <div class="col-lg-4 editLeftPanel p-4">
+                                        <div class="miniCard mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <div class="miniLabel">Priority</div>
+                                                    <div class="miniValue edit_preview_priority">${priorityText || 'Edit modal'}</div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="miniLabel">Status</div>
+                                                    <div class="miniValue edit_preview_status"><span class="badge badge-${status.color || 'secondary'}">${status.text || 'Edit modal'}</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="miniCard mb-3">
+                                            <div class="miniLabel">Timeline</div>
+                                                <div class="miniValue">
+                                                    <span class="edit_preview_start">—</span> → <span class="edit_preview_end">${rss.task.due_date || '--'}</span>
+                                                </div>
+                                            </div>
+                                            <div class="miniHint">
+                                                Tip: ডানে কিছু পরিবর্তন করলে বাম পাশে Summary auto-update করতে পারবে।
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-8 editRightPanel p-4">
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Subject</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tasks_title" value="${rss.task.title || ''}" placeholder="Task subject">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Tags</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tag || ''}">
+                                                </div>
+                                            </div>
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Short Details</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_short_details" placeholder="Short summary" value="${rss.task.short_title || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Note</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tasks_notes" placeholder="Internal note" value="${rss.task.note || ''}">
+                                                </div>
+                                            </div>
+                                            <div class="formRow3">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Start Date</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput date edit_start_date" placeholder="dd-mm-yyyy" value="${rss.task.start_date || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Due Date</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput date edit_end_date" placeholder="dd-mm-yyyy" value="${rss.task.due_date || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Assign To</label>
+                                                    <select class="form-control form-control-sm niceInput edit_user_id">
+                                                        <option value="">Select User</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{$user->id}}" ${rss.task.user_id == '{{$user->id}}' ? 'selected' : ''} >{{$user->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Priority</label>
+                                                    <select class="form-control form-control-sm niceInput edit_priority">
+                                                        <option value="1" ${rss.task.priority == 1 ? 'selected' : ''}>Low</option>
+                                                        <option value="2" ${rss.task.priority == 2 ? 'selected' : ''}>Medium</option>
+                                                        <option value="3" ${rss.task.priority == 3 ? 'selected' : ''}>High</option>
+                                                        <option value="4" ${rss.task.priority == 4 ? 'selected' : ''}>Urgent</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Status</label>
+                                                    <select class="form-control form-control-sm niceInput edit_status">
+                                                        <option value="1" ${rss.task.status == 1 ? 'selected' : ''} >In Progress</option>
+                                                        <option value="2" ${rss.task.status == 2 ? 'selected' : ''} >Not Started</option>
+                                                        <option value="3" ${rss.task.status == 3 ? 'selected' : ''} >Testing</option>
+                                                        <option value="4" ${rss.task.status == 4 ? 'selected' : ''} >Awaiting Feedback</option>
+                                                        <option value="5" ${rss.task.status == 5 ? 'selected' : ''} >Completed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="small font-weight-bold">Description</label>
+                                                <textarea class="form-control niceTextarea edit_description" rows="5" placeholder="Write full task description...">${rss.task.task_desc || ''}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // VERY IMPORTANT
+                        $('.date').datepicker({
+                            format: 'dd-mm-yyyy',
+                            autoclose: true
+                        });
                     },
                     error: function (xhr) {
                         if (xhr.status === 404) {
@@ -789,43 +1018,562 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                         }
                     }
                 });
-            }
+            });
+
+
+            $(document).on('click', '.update_task_btn', function (e) {
+                e.preventDefault();
+
+                const data = {
+                    id:             $('.edit_task_id').val(),
+                    title:          $('.edit_tasks_title').val(),
+                    tag:            $('.edit_tags').val(),
+                    short_title:    $('.edit_short_details').val(),
+                    note:           $('.edit_tasks_notes').val(),
+                    start_date:     $('.edit_start_date').val(),
+                    due_date:       $('.edit_end_date').val(),
+                    user_id:        $('.edit_user_id').val(),
+                    priority:       $('.edit_priority').val(),
+                    status:         $('.edit_status').val(),
+                    task_desc:      $('.edit_description').val(),
+                };
+
+                $.ajax({
+                    url: '/tasks/updateAll',
+                    type: 'POST', // বা 'PUT'
+                    data: data,
+                    success: function (res) {
+                        // success UI
+                        $('#view_and_edit_task').modal('hide');
+
+                        // quick toast/alert
+                        alert(res.message || 'Task updated successfully!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        // Laravel validation errors
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let msg = Object.values(errors).flat().join('\n');
+                            alert(msg);
+                        } else {
+                            alert('Something went wrong!');
+                        }
+                    }
+                });
+            });
+
+
+
+
         });
 
-        $(document).on('click', '.task_view_btn', function () {
-            let task_id = $(this).attr('task_id');
 
-            $.ajax({
-                type: "post",
-                url: "/tasks/find_single",
-                data: {
-                    id: task_id
-                },
-                beforeSend: function () {
-                    $("#loader").css('display', 'block');
-                },
-                dataType: "json",
-                success: function (rs) {
-                    $("#loader").css('display', 'none');
-                    $('#view_and_edit_taskTitle').text(rs.task.title);
-                    // $('.view_task_modal').html(``);
-                    $('#view_and_edit_task').modal('show');
-                },
-                error: function (xhr) {
-                    if (xhr.status === 404) {
-                        let errors = xhr.responseJSON.errors;
-                        alert(Object.values(errors).flat().join("\n"));
-                    }
+
+
+    </script>
+@else
+    <script type="text/javascript">
+
+
+
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+
+            get_tasks_data_info();
+
+            function get_tasks_data_info() {
+                $.ajax({
+                    type: "get",
+                    url: "task-get_data",
+                    data: "",
+                    dataType: "json",
+                    success: function (resp) {
+                        let res = resp.tasks;
+
+                        let statusCount = {
+                            1: 0,
+                            2: 0,
+                            3: 0,
+                            4: 0,
+                            5: 0
+                        };
+
+                        let data_html = '';
+                        for (let n = 0; n < res.length; n++) {
+                            statusCount[res[n].status]++;
+                            data_html += `<tr>
+                                            <td>${n + 1}</td>
+                                            <td>
+                                                <div class="task-name text-dark font-weight-bold d-block task_view_btn " task_id="${res[n].id}" style="cursor: pointer;" >${res[n].title}</div>
+                                                <small class="text-muted">${res[n].short_title || ''},</small>
+                                                <small class="text-muted">=> ${res[n].note || ''}</small>
+
+                                                <div class="row-options">
+                                                    <a style="cursor: pointer; " task_id="${res[n].id}" class="text-success task_view_btn">View </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <select class="status-dropdown-btn change_status_options " tasks_idd="${res[n].id}" data-toggle="dropdown" >
+                                                    <option value="1" ${res[n].status == 1 ? 'selected' : ''} class="dropdown-item">In Progress</option>
+                                                    <option value="2" ${res[n].status == 2 ? 'selected' : ''} class="dropdown-item">Mark as Not Started</option>
+                                                    <option value="3" ${res[n].status == 3 ? 'selected' : ''} class="dropdown-item">Mark as Testing</option>
+                                                    <option value="4" ${res[n].status == 4 ? 'selected' : ''} class="dropdown-item">Mark as Awaiting Feedback</option>
+                                                    <option value="5" ${res[n].status == 5 ? 'selected' : ''} class="dropdown-item">Mark as Complete</option>
+                                                </select>
+                                            </td>
+                                            <td>${res[n].start_date}</td>
+                                            <td>${res[n].due_date}</td>
+                                            <td>${res[n].user.name}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <select class="priority-dropdown-link task_priority_changeable " disabled task_id_au="${res[n].id}" data-toggle="dropdown">
+                                                        <option  value="1" ${res[n].priority == 1 ? 'selected' : ''}  class="dropdown-item" >Low</option>
+                                                        <option  value="2" ${res[n].priority == 2 ? 'selected' : ''}  class="dropdown-item" >Medium</option>
+                                                        <option  value="3" ${res[n].priority == 3 ? 'selected' : ''}  class="dropdown-item" >High</option>
+                                                        <option  value="4" ${res[n].priority == 4 ? 'selected' : ''}  class="dropdown-item" >Urgent</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr> `
+                        }
+                        $('.data_assigning').html(data_html);
+                        $(".card_11").text(statusCount[1]);
+                        $(".card_21").text(statusCount[2]);
+                        $(".card_31").text(statusCount[3]);
+                        $(".card_41").text(statusCount[4]);
+                        $(".card_51").text(statusCount[5]);
+
+                        const rowsPerPage = 5;
+                        let currentPage = 1;
+                        const $tableBody = $('.table-tasks tbody');
+                        const $rows = $tableBody.find('tr');
+
+                        function showPage(page, rowsToDisplay) {
+                            const start = (page - 1) * rowsPerPage;
+                            const end = start + rowsPerPage;
+                            rowsToDisplay.hide();
+                            const visibleRows = rowsToDisplay.slice(start, end);
+                            visibleRows.show();
+
+                            const total = rowsToDisplay.length;
+                            const currentEnd = end > total ? total : end;
+                            $('#tableInfo').text(total > 0 ? `Showing ${start + 1} to ${currentEnd} of ${total} entries` : "No entries found");
+                        }
+
+                        function initPagination(rowsToPaginate) {
+                            const pageCount = Math.ceil(rowsToPaginate.length / rowsPerPage);
+                            const $controls = $('#paginationControls');
+                            $controls.empty();
+                            for (let i = 1; i <= pageCount; i++) {
+                                const $li = $(`<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`);
+                                $li.click(function (e) {
+                                    e.preventDefault();
+                                    currentPage = i;
+                                    showPage(currentPage, rowsToPaginate);
+                                    $(this).addClass('active').siblings().removeClass('active');
+                                });
+                                $controls.append($li);
+                            }
+                            showPage(1, rowsToPaginate);
+                        }
+
+                        $('#taskSearch').on('keyup', function () {
+                            const value = $(this).val().toLowerCase();
+                            const filteredRows = $rows.filter(function () {
+                                return $(this).text().toLowerCase().indexOf(value) > -1;
+                            });
+                            $rows.hide();
+                            initPagination(filteredRows);
+                        });
+
+                        initPagination($rows);
+
+                    }
+                });
+            }
+
+            $(document).on('click', '.entry_new_task_btn', function (e) {
+                e.preventDefault();
+
+                if (!checkTaskFields()) {
+                    return;
+                }
+                let payload = {
+                    title:          $('.tasks_title').val(),
+                    start_date:     $('.start_datess').val(),
+                    short:          $('.short_details').val(),
+                    note:           $('.tasks_notes').val(),
+                    end_date:       $('.end_datess').val(),
+                    user_id:        $('.user_selected_idd option:selected').val(),
+                    priority:       $('.priority_selecteds option:selected').val(),
+                    status:         $('.selected_status_opt option:selected').val(),
+                    tag:            $('.tag_type_here').val(),
+                    description:    $('.task_description_typings').val(),
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/tasks/store",
+                    data: payload,
+                    dataType: "json",
+                    success: function (res) {
+                        console.log(res);
+                        $('#addTaskModal').modal('hide');
+                        alert(res.message ?? 'Task saved!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        console.log("Status:", xhr.status);
+                        console.log("Response:", xhr.responseText);
+
+                        // Laravel validation error হলে
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+            function checkTaskFields() {
+                let fields = [
+                    'tasks_title',
+                    'start_datess',
+                    'end_datess',
+                    'user_selected_idd option:selected',
+                    'priority_selecteds option:selected',
+                    'selected_status_opt option:selected',
+                    'tag_type_here',
+                    'task_description_typings',
+                    'short_details',
+                    'tasks_notes'
+                ];
+
+                let isValid = true;
+
+                fields.forEach(function (cls) {
+                    let value = $('.' + cls).val();
+
+                    if (!value || value.trim() === '') {
+                        isValid = false;
+                        $('.' + cls).addClass('is-invalid');
+                    } else {
+                        $('.' + cls).removeClass('is-invalid');
+                    }
+                });
+                if (!isValid) $('.is-invalid:first').focus();
+                return isValid;
+            }
+
+            function resetTaskFields() {
+
+                let allFields = [
+                    'tasks_title',
+                    'start_datess',
+                    'end_datess',
+                    'user_selected_idd',
+                    'priority_selecteds',
+                    'selected_status_opt',
+                    'tag_type_here',
+                    'task_description_typings'
+                ];
+
+                allFields.forEach(cls => {
+                    let el = $('.' + cls);
+
+                    if (el.is('select')) {
+                        el.val('').trigger('change');
+                    } else {
+                        el.val('');
+                    }
+
+                    el.removeClass('is-invalid');
+                });
+            }
+
+            $(document).on('change', '.change_status_options', function () {
+                let task_id = $(this).attr('tasks_idd');
+                let this_status_val = $(this).find('option:selected').val();
+
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/update",
+                    data: {
+                        task_id: task_id,
+                        type: 'status',
+                        value: this_status_val
+                    },
+                    success: function (rs) {
+                        alert(rs.message ?? 'Task Update!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+            $(document).on('change', '.task_priority_changeable', function () {
+                let task_id = $(this).attr('task_id_au');
+                let this_status_val = $(this).find('option:selected').val();
+
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/update",
+                    data: {
+                        task_id: task_id,
+                        type: 'priority',
+                        value: this_status_val
+                    },
+                    success: function (rs) {
+                        alert(rs.message ?? 'Task Update!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '._delete_task', function () {
+                let task_id = $(this).attr('task_id');
+                if (confirm('Are You sure to Delete? ')) {
+                    $.ajax({
+                        type: "post",
+                        url: "/tasks/delete",
+                        data: {
+                            id: task_id
+                        },
+                        success: function (rs) {
+                            alert(rs.message ?? 'Task Deleted!');
+                            get_tasks_data_info();
+                        },
+                        error: function (xhr) {
+                            if (xhr.status === 404) {
+                                let errors = xhr.responseJSON.errors;
+                                alert(Object.values(errors).flat().join("\n"));
+                            }
+                        }
+                    });
+                }
+            });
+
+            $(document).on('click', '.task_view_btn', function () {
+                let task_id = $(this).attr('task_id');
+
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/find_single",
+                    data: {
+                        id: task_id
+                    },
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                    },
+                    dataType: "json",
+                    success: function (rss) {
+
+                        let priorityText = ({
+                            1: 'Low',
+                            2: 'Medium',
+                            3: 'High',
+                            4: 'Urgent'
+                        }[rss.task.priority]) || '';
+
+                        const statusConfig = {
+                            1: { text: 'In Progress', color: 'primary' },
+                            2: { text: 'Not Started', color: 'secondary' },
+                            3: { text: 'Testing', color: 'info' },
+                            4: { text: 'Awaiting Feedback', color: 'warning' },
+                            5: { text: 'Completed', color: 'success' }
+                        };
+                        let status = statusConfig[rss.task.status];
+                        let html = status ? `<span class="badge badge-${status.color}">${status.text}</span>` : '';
+
+
+                        $("#loader").css('display', 'none');
+                        $('#view_and_edit_taskTitle').text(rss.task.title);
+                        $('#view_and_edit_taskDesc').text(rss.task.short_title);
+                        // $('.view_task_modal').html(``);
+                        $('#view_and_edit_task').modal('show');
+
+                        $('.modalBodyEditTaskData').html(`
+                            <div id="editTaskForm">
+                                <input type="hidden" class="edit_task_id" value="${rss.task.id || ''}">
+                                <div class="row no-gutters">
+                                    <div class="col-lg-4 editLeftPanel p-4">
+                                        <div class="miniCard mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <div class="miniLabel">Priority</div>
+                                                    <div class="miniValue edit_preview_priority">${priorityText || 'Edit modal'}</div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="miniLabel">Status</div>
+                                                    <div class="miniValue edit_preview_status"><span class="badge badge-${status.color || 'secondary'}">${status.text || 'Edit modal'}</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="miniCard mb-3">
+                                            <div class="miniLabel">Timeline</div>
+                                                <div class="miniValue">
+                                                    <span class="edit_preview_start">—</span> → <span class="edit_preview_end">${rss.task.due_date || '--'}</span>
+                                                </div>
+                                            </div>
+                                            <div class="miniHint">
+                                                Tip: ডানে কিছু পরিবর্তন করলে বাম পাশে Summary auto-update করতে পারবে।
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-8 editRightPanel p-4">
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Subject</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tasks_title" value="${rss.task.title || ''}" placeholder="Task subject">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Tags</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tag || ''}">
+                                                </div>
+                                            </div>
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Short Details</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_short_details" placeholder="Short summary" value="${rss.task.short_title || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Note</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tasks_notes" placeholder="Internal note" value="${rss.task.note || ''}">
+                                                </div>
+                                            </div>
+                                            <div class="formRow3">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Start Date</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput date edit_start_date" placeholder="dd-mm-yyyy" value="${rss.task.start_date || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Due Date</label>
+                                                    <input type="text" class="form-control form-control-sm niceInput date edit_end_date" placeholder="dd-mm-yyyy" value="${rss.task.due_date || ''}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Assign To</label>
+                                                    <select class="form-control form-control-sm niceInput edit_user_id">
+                                                        <option value="">Select User</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{$user->id}}" ${rss.task.user_id == '{{$user->id}}' ? 'selected' : ''} >{{$user->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="formRow2">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Priority</label>
+                                                    <select class="form-control form-control-sm niceInput edit_priority">
+                                                        <option value="1" ${rss.task.priority == 1 ? 'selected' : ''}>Low</option>
+                                                        <option value="2" ${rss.task.priority == 2 ? 'selected' : ''}>Medium</option>
+                                                        <option value="3" ${rss.task.priority == 3 ? 'selected' : ''}>High</option>
+                                                        <option value="4" ${rss.task.priority == 4 ? 'selected' : ''}>Urgent</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold">Status</label>
+                                                    <select class="form-control form-control-sm niceInput edit_status">
+                                                        <option value="1" ${rss.task.status == 1 ? 'selected' : ''} >In Progress</option>
+                                                        <option value="2" ${rss.task.status == 2 ? 'selected' : ''} >Not Started</option>
+                                                        <option value="3" ${rss.task.status == 3 ? 'selected' : ''} >Testing</option>
+                                                        <option value="4" ${rss.task.status == 4 ? 'selected' : ''} >Awaiting Feedback</option>
+                                                        <option value="5" ${rss.task.status == 5 ? 'selected' : ''} >Completed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="small font-weight-bold">Description</label>
+                                                <textarea class="form-control niceTextarea edit_description" rows="5" placeholder="Write full task description...">${rss.task.task_desc || ''}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // VERY IMPORTANT
+                        $('.date').datepicker({
+                            format: 'dd-mm-yyyy',
+                            autoclose: true
+                        });
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 404) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            });
+
+
+            $(document).on('click', '.update_task_btn', function (e) {
+                e.preventDefault();
+
+                const data = {
+                    id:             $('.edit_task_id').val(),
+                    title:          $('.edit_tasks_title').val(),
+                    tag:            $('.edit_tags').val(),
+                    short_title:    $('.edit_short_details').val(),
+                    note:           $('.edit_tasks_notes').val(),
+                    start_date:     $('.edit_start_date').val(),
+                    due_date:       $('.edit_end_date').val(),
+                    user_id:        $('.edit_user_id').val(),
+                    priority:       $('.edit_priority').val(),
+                    status:         $('.edit_status').val(),
+                    task_desc:      $('.edit_description').val(),
+                };
+
+                $.ajax({
+                    url: '/tasks/updateAll',
+                    type: 'POST', // বা 'PUT'
+                    data: data,
+                    success: function (res) {
+                        // success UI
+                        $('#view_and_edit_task').modal('hide');
+
+                        // quick toast/alert
+                        alert(res.message || 'Task updated successfully!');
+                        get_tasks_data_info();
+                    },
+                    error: function (xhr) {
+                        // Laravel validation errors
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let msg = Object.values(errors).flat().join('\n');
+                            alert(msg);
+                        } else {
+                            alert('Something went wrong!');
+                        }
+                    }
+                });
+            });
+
+
+
+
         });
 
 
 
-    });
 
-
-
-
-</script>
+    </script>
+@endif
 @endpush

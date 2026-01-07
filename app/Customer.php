@@ -26,4 +26,9 @@ class Customer extends Model
     {
         return $this->belongsToMany('App\DiscountPlan', 'discount_plan_customers');
     }
+
+    public function sales()
+    {
+        return $this->hasMany('App\Sale', 'customer_id');
+    }
 }

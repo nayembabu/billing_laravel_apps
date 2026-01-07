@@ -613,16 +613,19 @@ class HomeController extends Controller
 
     public function tasks_view_file()
     {
-        $tasks = Tasks::with('user')->get();
-        $users = User::get();
+        $tasks = Tasks::with('user')->where('activity', 1)->get();
+        $users = User::where('is_active', 1)->get();
         return view('tasks.index', compact('tasks', 'users'));
     }
 
     public function tasks_view_fileget_tasks_data_api()
     {
         $data['tasks'] = Tasks::with('user')
-                                ->where('activity', 1)
-                                ->get();
+                            ->where('activity', 1)
+                            ->when(Auth::user()->role_id != 1, function ($q) {
+                                $q->where('user_id', Auth::id());
+                            })
+                            ->get();
         return $data;
     }
 
@@ -747,6 +750,44 @@ class HomeController extends Controller
             'task'    => $task
         ]);
 
+    }
+
+    public function updateAll(Request $request)
+    {
+        $request->validate([
+            'id'            => 'required|exists:tasks,id',
+            'title'         => 'required|string|max:255',
+            'short_title'   => 'nullable|string|max:255',
+            'note'          => 'nullable|string|max:255',
+            'tag'           => 'nullable|string|max:255',
+            'start_date'    => 'nullable|string|max:20',
+            'due_date'      => 'nullable|string|max:20',
+            'user_id'       => 'nullable|exists:users,id',
+            'priority'      => 'nullable|in:1,2,3,4',
+            'status'        => 'nullable|in:1,2,3,4,5',
+            'task_desc'     => 'nullable|string',
+        ]);
+
+        $task = Tasks::findOrFail($request->id);
+
+        $task->title        = $request->title;
+        $task->short_title  = $request->short_title;
+        $task->note         = $request->note;
+        $task->tags         = $request->tag;
+        $task->start_date   = $request->start_date;
+        $task->due_date     = $request->due_date;
+        $task->user_id      = $request->user_id;
+        $task->priority     = $request->priority;
+        $task->status       = $request->status;
+        $task->task_desc    = $request->task_desc;
+
+        $task->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Task updated successfully!',
+            'task' => $task
+        ]);
     }
 
 
