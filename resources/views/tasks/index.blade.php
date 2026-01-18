@@ -223,7 +223,319 @@
         background: #f9fafb;
     }
 
-</style>
+        .notes-section {
+            flex: 3;
+            min-width: 500px;
+        }
+
+        .attachments-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .card-header i {
+            font-size: 1.8em;
+            margin-right: 15px;
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Notes Styles */
+        .note-item {
+            background: #ffffff;
+            padding: 18px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #4a90e2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .note-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .note-author {
+            font-weight: 500;
+            color: #4a90e2;
+        }
+
+        .new-note {
+            margin-top: 30px;
+        }
+
+        .new-note textarea {
+            width: 100%;
+            height: 120px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: #f9fbff;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .new-note textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+
+        .new-note button {
+            margin-top: 15px;
+            padding: 12px 28px;
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .new-note button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Attachments Styles */
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: #ffffff;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+
+        .attachment-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .attachment-item i {
+            font-size: 1.8em;
+            margin-right: 15px;
+            color: #27ae60;
+        }
+
+        .attachment-item a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .attachment-item a:hover {
+            color: #27ae60;
+        }
+
+
+
+
+
+
+
+
+
+
+
+    .upload-area {
+        width: 380px;
+        padding: 40px;
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+    }
+
+    .upload-area:hover {
+        transform: translateY(-8px);
+    }
+
+    .upload-area i {
+        font-size: 4.5em;
+        background: linear-gradient(45deg, #27ae60, #1e8449);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .upload-title {
+        font-size: 1.4em;
+        color: var(--text);
+        margin: 15px 0;
+        font-weight: 600;
+    }
+
+    .upload-hint {
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .custom-file-button {
+        padding: 14px 20px;
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--text);
+        border: 2px dashed var(--secondary);
+        border-radius: 12px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .custom-file-button:hover {
+        background: rgba(139, 92, 246, 0.3);
+        border-color: var(--accent);
+    }
+
+    /* প্রিভিউ স্টাইল */
+    .preview-area {
+        margin: 25px 0;
+        padding: 20px;
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 16px;
+        border: 1px solid var(--secondary);
+    }
+
+    .preview-area img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .preview-area .file-icon {
+        font-size: 5em;
+        color: var(--secondary);
+        margin-bottom: 15px;
+    }
+
+    #fileInfo {
+        display: block;
+        margin: 15px 0;
+        color: var(--text-secondary);
+    }
+
+    .clear-btn {
+        margin-top: 15px;
+        padding: 8px 20px;
+        background: rgba(236, 72, 153, 0.3);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+
+    .clear-btn:hover {
+        background: var(--accent);
+    }
+
+    .upload-btn {
+        padding: 14px 40px;
+        background: linear-gradient(45deg, var(--secondary), var(--accent));
+        color: black;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-4px);
+    }
+
+
+
+
+
+
+
+
+
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            .notes-section, .attachments-section {
+                flex: 1;
+            }
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @if(session()->has('not_permitted'))
 <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
         aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
@@ -254,7 +566,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
     <div class="container-fluid">
         <div class="col-md-12 ">
             <div class="brand-text float-left mt-4">
-                <h3>{{trans('file.welcome')}} <span>{{Auth::user()->role_id}}</span> </h3>
+                <h3>{{trans('file.welcome')}} <span>{{Auth::user()->name}}</span> </h3>
             </div>
         </div>
     </div>
@@ -396,8 +708,6 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
             <!-- View and Edit Task -->
 
 
-
-
         <!-- Add New Task Modal -->
         <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -478,11 +788,9 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                     <div class="form-group">
                                         <label class="font-weight-bold small text-muted">Due Date</label>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control date end_datess"
-                                                value="{{date('d-m-Y')}}">
+                                            <input type="text" class="form-control date end_datess" value="{{date('d-m-Y')}}">
                                             <div class="input-group-append">
-                                                <span class="input-group-text"><i
-                                                        class="far fa-calendar-alt"></i></span>
+                                                <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -496,7 +804,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                         <select class="form-control form-control-sm user_selected_idd ">
                                             <option value="">Select User</option>
                                             @foreach ($users as $user)
-                                            <option value="{{$user->id}}">{{$user->name}}</option>
+                                                <option value="{{$user->id}}">{{$user->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -558,8 +866,27 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
             </div>
         </div>
 
-
-
+        <!-- Add Note Task Modal -->
+        <div class="modal fade" id="notesAddTaskm" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-weight-bold" style="font-size: 16px; color: #4e5154;">
+                            Note Model
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body all_note_attch_html "></div>
+                    <div class="modal-footer">
+                        <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-dark btn-sm px-3 entry_new_task_btn ">Save</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add Note Task Modal -->
 
     </div>
 
@@ -570,8 +897,6 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 @push('scripts')
 @if(Auth::user()->role_id == 1)
     <script type="text/javascript">
-
-
 
         $(document).ready(function () {
             $.ajaxSetup({
@@ -612,6 +937,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                                                 <div class="row-options">
                                                     <a style="cursor: pointer; " task_id="${res[n].id}" class="text-success task_view_btn">View </a>
+                                                    <a style="cursor: pointer; margin-left: 10px; " task_id="${res[n].id}" class="text-primary notesAddTask ">Note </a>
                                                     <a style="cursor: pointer; margin-left: 10px;" task_id="${res[n].id}" class="text-danger _delete_task task-delete">Delete </a>
                                                 </div>
                                             </td>
@@ -867,6 +1193,256 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                 }
             });
 
+
+            $(document).on('click', '.notesAddTask', function () {
+                let task_id = $(this).attr('task_id');
+                get_task_notes_and_attachments(task_id)
+            })
+
+            function get_task_notes_and_attachments(task_id) {
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/find_notes",
+                    data: {
+                        id: task_id
+                    },
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                    },
+                    dataType: "json",
+                    success: function (rss) {
+                        $("#loader").css('display', 'none');
+                        $('#notesAddTaskm').modal('show');
+
+                        let note_html = '';
+                        let note_attatch = '';
+
+                        if (rss.status) {
+                            for (let n = 0; n < rss.task.notes.length; n++) {
+                                var noteDate = new Date(rss.task.notes[n].created_at).toLocaleString('bn-BD', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                                note_html += `<div class="note-item">
+                                                <div class="note-meta">
+                                                    <span class="note-author">${(rss.task.notes[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'ইউজার'}</span>
+                                                    <span>${noteDate}</span>
+                                                </div>
+                                                <p>অর্ডারটি দ্রুত ডেলিভারি করার অনুরোধ করেছেন। বিশেষ নির্দেশ: সকালে ডেলিভারি করতে হবে।</p>
+                                            </div>`;
+                            }
+
+                            for (let n = 0; n < rss.task.attachments.length; n++) {
+                                var attachDate = new Date(rss.task.attachments[n].created_at).toLocaleString('bn-BD', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                                note_attatch += `<li class="attachment-item">
+                                                <i class="fas fa-file-pdf"></i>
+                                                <a href="/${rss.task.attachments[n].task_attatch_path}" download target="_blank" >Uploaded File</a>
+                                                <small style="margin-left: auto; color: #aaa;">আপলোড করেছেন: ${(rss.task.attachments[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'ইউজার'} •  ${attachDate}} </small>
+                                            </li>`;
+                            }
+
+                            $('.all_note_attch_html').html(
+                                `<div class="container">
+                                    <div class="notes-section">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="fas fa-sticky-note"></i>
+                                                <h2>কাস্টমার নোটসমূহ</h2>
+                                            </div>
+                                            <div class="notes-list">${note_html}</div>
+                                            <div class="new-note">
+                                                <textarea class="new_note_types " placeholder="নতুন নোট লিখুন..."></textarea>
+                                                <button class="btn btn-success new_note_added_btn " task_id="${task_id}">নোট যোগ করুন</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="attachments-section">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="fas fa-paperclip"></i>
+                                                <h2>অ্যাটাচমেন্টস</h2>
+                                            </div>
+
+                                            <ul class="attachment-list" style="list-style: none; padding: 0;">
+                                                ${note_attatch}
+                                            </ul>
+
+                                            <div class="upload-area">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p class="upload-title">নতুন ফাইল আপলোড করুন</p>
+                                                <p class="upload-hint">একটি ফাইল সিলেক্ট করুন (PDF, JPG, PNG ইত্যাদি)</p>
+
+                                                <!-- প্রিভিউ এরিয়া -->
+                                                <div id="previewArea" class="preview-area" style="display: none;">
+                                                    <div id="previewContent"></div>
+                                                    <small id="fileInfo"></small>
+                                                    <button id="clearPreview" class="clear-btn">পরিষ্কার করুন</button>
+                                                </div>
+
+                                                <!-- কাস্টম ফাইল ইনপুট -->
+                                                <div class="file-input-wrapper">
+                                                    <input type="file" id="fileInput" class="new_file_added" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx">
+                                                    <div class="custom-file-button">
+                                                        ফাইল সিলেক্ট করুন
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-success upload-btn new_file_btn_added " task_id="${task_id}">আপলোড করুন</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>`
+                            );
+                            const fileInput = document.getElementById('fileInput');
+                            const previewArea = document.getElementById('previewArea');
+                            const previewContent = document.getElementById('previewContent');
+                            const fileInfo = document.getElementById('fileInfo');
+                            const clearBtn = document.getElementById('clearPreview');
+
+                            fileInput.addEventListener('change', function() {
+                                const file = this.files[0];
+                                if (!file) {
+                                    previewArea.style.display = 'none';
+                                    return;
+                                }
+
+                                // ফাইল ইনফো
+                                const fileName = file.name;
+                                const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+
+                                fileInfo.textContent = `${fileName} (${fileSize})`;
+
+                                // প্রিভিউ
+                                if (file.type.startsWith('image/')) {
+                                    const img = document.createElement('img');
+                                    img.src = URL.createObjectURL(file);
+                                    previewContent.innerHTML = '';
+                                    previewContent.appendChild(img);
+                                } else {
+                                    // অন্য ফাইল (PDF, DOC ইত্যাদি) — আইকন দেখাও
+                                    let iconClass = 'fas fa-file';
+                                    if (file.type === 'application/pdf') iconClass = 'fas fa-file-pdf';
+                                    else if (file.type.includes('word')) iconClass = 'fas fa-file-word';
+
+                                    previewContent.innerHTML = `<i class="${iconClass} file-icon"></i><p>${fileName}</p>`;
+                                }
+
+                                previewArea.style.display = 'block';
+                            });
+
+                            // পরিষ্কার বাটন
+                            clearBtn.addEventListener('click', function() {
+                                fileInput.value = '';
+                                previewArea.style.display = 'none';
+                            });
+
+
+                        } else {
+                            alert('কোনো ত্রুটি হয়েছে!');
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 404) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            }
+
+            $(document).on('click', '.new_note_added_btn', function () {
+                let task_id = $(this).attr('task_id');
+                let noteText = $('.new_note_types').val().trim();
+                if (noteText === '') {
+                    alert('নোট লিখুন!');
+                    return;
+                }
+                $.ajax({
+                    url: 'tasks/add_note',
+                    type: 'POST',
+                    data: {
+                        task_id: task_id,
+                        note: noteText
+                    },
+                    beforeSend: function () {
+                        $('.new_note_added_btn').prop('disabled', true).text('যোগ হচ্ছে...');
+                        $("#loader").css('display', 'block');
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            get_task_notes_and_attachments(task_id);
+                            $('.new_note_types').val('');
+                            alert(response.message);
+
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('সার্ভারে সমস্যা হয়েছে!');
+                    },
+                    complete: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_note_added_btn').prop('disabled', false).text('নোট যোগ করুন');
+                    }
+                });
+            });
+
+            $(document).on('click', '.new_file_btn_added', function () {
+
+                let task_id = $(this).attr('task_id');
+                var file = $('#fileInput')[0].files[0];
+
+                if (!file) {
+                    alert('কোনো ফাইল সিলেক্ট করুন!');
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('attachment', file);
+                formData.append('task_id', task_id);
+
+                $.ajax({
+                    url: 'tasks/upload_attachment',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_file_btn_added').prop('disabled', true).text('আপলোড হচ্ছে...');
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            get_task_notes_and_attachments(task_id);
+                            alert(response.message);
+                            $('#fileInput').val(''); // ক্লিয়ার
+                            previewArea.style.display = 'none';
+
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('আপলোডে সমস্যা হয়েছে!');
+                    },
+                    complete: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_file_btn_added').prop('disabled', false).text('আপলোড করুন');
+                    }
+                });
+            });
+
             $(document).on('click', '.task_view_btn', function () {
                 let task_id = $(this).attr('task_id');
 
@@ -1116,6 +1692,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                                                 <div class="row-options">
                                                     <a style="cursor: pointer; " task_id="${res[n].id}" class="text-success task_view_btn">View </a>
+                                                    <a style="cursor: pointer; margin-left: 10px; " task_id="${res[n].id}" class="text-primary notesAddTask ">Note </a>
                                                 </div>
                                             </td>
                                             <td>
@@ -1368,6 +1945,251 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                         }
                     });
                 }
+            });
+
+            $(document).on('click', '.notesAddTask', function () {
+                let task_id = $(this).attr('task_id');
+                get_task_notes_and_attachments(task_id)
+            })
+
+            function get_task_notes_and_attachments(task_id) {
+                $.ajax({
+                    type: "post",
+                    url: "/tasks/find_notes",
+                    data: {
+                        id: task_id
+                    },
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                    },
+                    dataType: "json",
+                    success: function (rss) {
+                        $("#loader").css('display', 'none');
+                        $('#notesAddTaskm').modal('show');
+
+                        let note_html = '';
+                        let note_attatch = '';
+
+                        if (rss.status) {
+                            for (let n = 0; n < rss.task.notes.length; n++) {
+                                var noteDate = new Date(rss.task.notes[n].created_at).toLocaleString('bn-BD', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                                note_html += `<div class="note-item">
+                                                <div class="note-meta">
+                                                    <span class="note-author">${(rss.task.notes[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'এডমিন'}</span>
+                                                    <span>${noteDate}</span>
+                                                </div>
+                                                <p>অর্ডারটি দ্রুত ডেলিভারি করার অনুরোধ করেছেন। বিশেষ নির্দেশ: সকালে ডেলিভারি করতে হবে।</p>
+                                            </div>`;
+                            }
+
+                            for (let n = 0; n < rss.task.attachments.length; n++) {
+                                var attachDate = new Date(rss.task.attachments[n].created_at).toLocaleString('bn-BD', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                                note_attatch += `<li class="attachment-item">
+                                                <i class="fas fa-file-pdf"></i>
+                                                <a href="/${rss.task.attachments[n].task_attatch_path}" download target="_blank" >Uploaded File</a>
+                                                <small style="margin-left: auto; color: #aaa;">আপলোড করেছেন: ${(rss.task.attachments[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'ইউজার'} •  ${attachDate}} </small>
+                                            </li>`;
+                            }
+
+                            $('.all_note_attch_html').html(
+                                `<div class="container">
+                                    <div class="notes-section">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="fas fa-sticky-note"></i>
+                                                <h2>কাস্টমার নোটসমূহ</h2>
+                                            </div>
+                                            <div class="notes-list">${note_html}</div>
+                                            <div class="new-note">
+                                                <textarea class="new_note_types " placeholder="নতুন নোট লিখুন..."></textarea>
+                                                <button class="btn btn-success new_note_added_btn " task_id="${task_id}">নোট যোগ করুন</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="attachments-section">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="fas fa-paperclip"></i>
+                                                <h2>অ্যাটাচমেন্টস</h2>
+                                            </div>
+
+                                            <ul class="attachment-list" style="list-style: none; padding: 0;">
+                                                ${note_attatch}
+                                            </ul>
+
+                                            <div class="upload-area">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p class="upload-title">নতুন ফাইল আপলোড করুন</p>
+                                                <p class="upload-hint">একটি ফাইল সিলেক্ট করুন (PDF, JPG, PNG ইত্যাদি)</p>
+
+                                                <!-- প্রিভিউ এরিয়া -->
+                                                <div id="previewArea" class="preview-area" style="display: none;">
+                                                    <div id="previewContent"></div>
+                                                    <small id="fileInfo"></small>
+                                                    <button id="clearPreview" class="clear-btn">পরিষ্কার করুন</button>
+                                                </div>
+
+                                                <!-- কাস্টম ফাইল ইনপুট -->
+                                                <div class="file-input-wrapper">
+                                                    <input type="file" id="fileInput" class="new_file_added" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx">
+                                                    <div class="custom-file-button">
+                                                        ফাইল সিলেক্ট করুন
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-success upload-btn new_file_btn_added " task_id="${task_id}">আপলোড করুন</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>`
+                            );
+                            const fileInput = document.getElementById('fileInput');
+                            const previewArea = document.getElementById('previewArea');
+                            const previewContent = document.getElementById('previewContent');
+                            const fileInfo = document.getElementById('fileInfo');
+                            const clearBtn = document.getElementById('clearPreview');
+
+                            fileInput.addEventListener('change', function() {
+                                const file = this.files[0];
+                                if (!file) {
+                                    previewArea.style.display = 'none';
+                                    return;
+                                }
+
+                                const fileName = file.name;
+                                const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+
+                                fileInfo.textContent = `${fileName} (${fileSize})`;
+
+                                if (file.type.startsWith('image/')) {
+                                    const img = document.createElement('img');
+                                    img.src = URL.createObjectURL(file);
+                                    previewContent.innerHTML = '';
+                                    previewContent.appendChild(img);
+                                } else {
+                                    let iconClass = 'fas fa-file';
+                                    if (file.type === 'application/pdf') iconClass = 'fas fa-file-pdf';
+                                    else if (file.type.includes('word')) iconClass = 'fas fa-file-word';
+
+                                    previewContent.innerHTML = `<i class="${iconClass} file-icon"></i><p>${fileName}</p>`;
+                                }
+
+                                previewArea.style.display = 'block';
+                            });
+
+                            clearBtn.addEventListener('click', function() {
+                                fileInput.value = '';
+                                previewArea.style.display = 'none';
+                            });
+
+
+                        } else {
+                            alert('কোনো ত্রুটি হয়েছে!');
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 404) {
+                            let errors = xhr.responseJSON.errors;
+                            alert(Object.values(errors).flat().join("\n"));
+                        }
+                    }
+                });
+            }
+
+            $(document).on('click', '.new_note_added_btn', function () {
+                let task_id = $(this).attr('task_id');
+                let noteText = $('.new_note_types').val().trim();
+                if (noteText === '') {
+                    alert('নোট লিখুন!');
+                    return;
+                }
+                $.ajax({
+                    url: 'tasks/add_note',
+                    type: 'POST',
+                    data: {
+                        task_id: task_id,
+                        note: noteText
+                    },
+                    beforeSend: function () {
+                        $('.new_note_added_btn').prop('disabled', true).text('যোগ হচ্ছে...');
+                        $("#loader").css('display', 'block');
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            get_task_notes_and_attachments(task_id);
+                            $('.new_note_types').val('');
+                            alert(response.message);
+
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('সার্ভারে সমস্যা হয়েছে!');
+                    },
+                    complete: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_note_added_btn').prop('disabled', false).text('নোট যোগ করুন');
+                    }
+                });
+            });
+
+            $(document).on('click', '.new_file_btn_added', function () {
+
+                let task_id = $(this).attr('task_id');
+                var file = $('#fileInput')[0].files[0];
+
+                if (!file) {
+                    alert('কোনো ফাইল সিলেক্ট করুন!');
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('attachment', file);
+                formData.append('task_id', task_id);
+
+                $.ajax({
+                    url: 'tasks/upload_attachment',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_file_btn_added').prop('disabled', true).text('আপলোড হচ্ছে...');
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            get_task_notes_and_attachments(task_id);
+                            alert(response.message);
+                            $('#fileInput').val('');
+                            previewArea.style.display = 'none';
+
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('আপলোডে সমস্যা হয়েছে!');
+                    },
+                    complete: function () {
+                        $("#loader").css('display', 'block');
+                        $('.new_file_btn_added').prop('disabled', false).text('আপলোড করুন');
+                    }
+                });
             });
 
             $(document).on('click', '.task_view_btn', function () {

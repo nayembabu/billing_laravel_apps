@@ -19,6 +19,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Mail\UserNotification;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
 class CustomerController extends Controller
@@ -428,7 +429,12 @@ class CustomerController extends Controller
                 'customers.address',
                 \DB::raw('MAX(sales.created_at) as last_purchase_date')
             )
-            ->groupBy('customers.id');
+            ->groupBy(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.address'
+            );
 
         if ($filter === '7') {
             $query->having('last_purchase_date', '<=', Carbon::now()->subDays(7));
@@ -438,32 +444,73 @@ class CustomerController extends Controller
 
         $customers = $query->get();
 
-        // Return JSON for AJAX
         return response()->json([
-            'message'       => 'data find successfully',
-            'status'        => 1,
-            'allCustomer'   => $customers
+            'message'     => 'data find successfully',
+            'status'      => 1,
+            'allCustomer' => $customers
         ]);
+
     }
 
 
     public function sendSms(Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message'        => 'required|string',
             'mobile_numbers' => 'required|string',
         ]);
 
         $message = $request->message;
-        $mobileNumbers = explode(',', $request->mobile_numbers);
+        $mobileNumbers = is_array($request->mobile_numbers)
+                        ? $request->mobile_numbers
+                        : explode(',', $request->mobile_numbers);
 
-        // এখানে তোমার SMS sending logic
-        // Example: foreach($mobileNumbers as $number) { sendSms($number, $message); }
+        $smsData = [];
+        foreach ($mobileNumbers as $number) {
+            $number = trim($number); // স্পেস থাকলে কেটে ফেলবে
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'SMS sent successfully!',
-        ]);
+            if ($number !== '') {
+                $smsData[] = [
+                    "MobNumber" => '88'.$number,
+                    "Message"   => $message,
+                ];
+            }
+        }
+
+        $payload = [
+            "UserName"          => "tspgloballimited@gmail.com",
+            "Apikey"            => "PQDDZW8LAC8Z4HSR9KDA65MRM",
+            "SenderName"        => "8809617621093",
+            "TransactionType"   => "D",
+            "SmsData"           => $smsData,
+        ];
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        ])->post('https://api.mimsms.com/api/SmsSending/DSMS', $payload);
+
+        if ($response->ok()) {
+            $data = $response->json();
+            if (($data['status'] ?? '') === 'Success') {
+                return response()->json([
+                    'status'  => 1,
+                    'message' => $data['responseResult'],
+                    'trx_id'  => $data['trxnId'],
+                ]);
+            }
+            return response()->json([
+                'status'  => 0,
+                'message' => 'SMS API responded but not successful',
+                'api'     => $data,
+            ], 422);
+        }else {
+            return response()->json([
+                'status'  => 0,
+                'message' => 'SMS API call failed',
+                'error'   => $response->body(),
+            ], 500);
+        }
     }
 
 

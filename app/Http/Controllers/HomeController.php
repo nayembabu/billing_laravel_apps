@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-
+use App\TaskNote;
+use App\TaskAttach;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Tasks;
@@ -789,6 +791,65 @@ class HomeController extends Controller
             'task' => $task
         ]);
     }
+
+    public function find_this_task_note_and_attachment_by_id(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:tasks,id',
+        ]);
+
+        $task = Tasks::with(['notes.user', 'attachments.user'])->find($request->id);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Task updated successfully!',
+            'task' => $task,
+            'current_user_id' => auth()->id() ?? null
+        ]);
+    }
+
+    public function add_new_this_task(Request $request)
+    {
+        $request->validate([
+            'task_id'   => 'required|integer|exists:tasks,id',
+            'note'      => 'required|string|max:1000',
+        ]);
+
+        TaskNote::create([
+            'task_id' => $request->task_id,
+            'task_note_detals' => $request->note,
+            'task_user_id' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'নোট যোগ করা সফল!',
+        ]);
+    }
+
+    public function add_upload_attachment(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'attachment' => 'required|file|mimes:pdf,jpg,jpeg,png,docx,xlsx|max:10240',
+        ]);
+
+        $folder = 'task-attachments/tasks/' . $request->task_id;
+
+        $path = $request->file('attachment')->store($folder, 'public');
+
+        TaskAttach::create([
+            'task_id' => $request->task_id,
+            'task_attatch_path' => 'storage/' . $path,
+            'user_id' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'অ্যাটাচমেন্ট আপলোড সফল!',
+        ]);
+    }
+
 
 
 }
