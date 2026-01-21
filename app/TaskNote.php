@@ -12,7 +12,8 @@
             'task_id',
             'task_note_detals', // সম্ভবত task_note_details হবে
             'task_user_id',
-            'created_at'
+            'created_at',
+            'is_read'
         ];
 
         public function task()

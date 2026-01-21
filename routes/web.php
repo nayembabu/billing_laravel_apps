@@ -332,6 +332,12 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::post('/tasks/add_note', 'HomeController@add_new_this_task')->name('task.add_note');
 	Route::post('/tasks/upload_attachment', 'HomeController@add_upload_attachment')->name('task.upload_attachment');
 
+    Route::post('/task-note/read/{id}', 'HomeController@markNoteRead')->name('task.note.read');
+    Route::post('/task-attach/read/{id}', 'HomeController@markAttachRead')->name('task.attach.read');
+
+
+
+
 	Route::get('/crm', 'CustomerController@send_sms_view_file')->name('crm.index');
 	Route::get('/crm/get_customer', 'CustomerController@get_all_customer')->name('crm.get_customer');
     Route::get('/crm/filter', 'CustomerController@filterCustomers')->name('crm.filter');

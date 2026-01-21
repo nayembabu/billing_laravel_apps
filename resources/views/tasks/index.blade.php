@@ -577,6 +577,52 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 <section class="dashboard-counts">
     <div class="container-fluid">
 
+        @if($unreadNotes->count())
+            <h5 class="mt-3">Unread Notes</h5>
+            @foreach($unreadNotes as $note)
+                <div class="alert alert-info d-flex justify-content-between align-items-center py-2 mb-2">
+                    <div>
+                        <strong>{{ $note->user->name ?? 'System' }}</strong> —
+                        {{ Str::limit($note->note, 60) }}
+                        <small class="text-muted ms-2">
+                            {{ $note->created_at->diffForHumans() }}
+                        </small>
+                    </div>
+
+                    <form action="{{ route('task.note.read', $note->id) }}" method="POST" class="ms-2 mb-0">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">
+                            Mark
+                        </button>
+                    </form>
+                </div>
+            @endforeach
+        @endif
+
+        @if($unreadAttachments->count())
+            <h5 class="mt-3">Unread Attachments</h5>
+            @foreach($unreadAttachments as $attach)
+                <div class="alert alert-warning d-flex justify-content-between align-items-center py-2 mb-2">
+                    <div>
+                        <strong>{{ $attach->user->name ?? 'System' }}</strong> —
+                        <a href="{{ asset($attach->file_path) }}" target="_blank" class="text-decoration-none">
+                            {{ Str::limit($attach->file_name, 40) }}
+                        </a>
+                        <small class="text-muted ms-2">
+                            {{ $attach->created_at->diffForHumans() }}
+                        </small>
+                    </div>
+
+                    <form action="{{ route('task.attach.read', $attach->id) }}" method="POST" class="ms-2 mb-0">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">
+                            Mark
+                        </button>
+                    </form>
+                </div>
+            @endforeach
+        @endif
+
 
         <div class="container-fluid py-4">
             <div class="row mb-4">
@@ -867,7 +913,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title font-weight-bold" style="font-size: 16px; color: #4e5154;">
+                        <h5 class="modal-title font-weight-bold add_note_model_add" style="font-size: 16px; color: #4e5154;">
                             Note Model
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -1023,23 +1069,22 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                 if (!checkTaskFields()) {
                     return;
                 }
-                let payload = {
-                    title:          $('.tasks_title').val(),
-                    start_date:     $('.start_datess').val(),
-                    short:          $('.short_details').val(),
-                    note:           $('.tasks_notes').val(),
-                    end_date:       $('.end_datess').val(),
-                    user_id:        $('.user_selected_idd option:selected').val(),
-                    priority:       $('.priority_selecteds option:selected').val(),
-                    status:         $('.selected_status_opt option:selected').val(),
-                    tag:            $('.tag_type_here').val(),
-                    description:    $('.task_description_typings').val(),
-                };
 
                 $.ajax({
                     type: "POST",
                     url: "/tasks/store",
-                    data: payload,
+                    data: {
+                        title:          $('.tasks_title').val(),
+                        start_date:     $('.start_datess').val(),
+                        short:          $('.short_details').val(),
+                        note:           $('.tasks_notes').val(),
+                        end_date:       $('.end_datess').val(),
+                        user_id:        $('.user_selected_idd option:selected').val(),
+                        priority:       $('.priority_selecteds option:selected').val(),
+                        status:         $('.selected_status_opt option:selected').val(),
+                        tag:            $('.tag_type_here').val(),
+                        description:    $('.task_description_typings').val(),
+                    },
                     dataType: "json",
                     success: function (res) {
                         console.log(res);
@@ -1215,7 +1260,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                         if (rss.status) {
                             for (let n = 0; n < rss.task.notes.length; n++) {
-                                var noteDate = new Date(rss.task.notes[n].created_at).toLocaleString('bn-BD', {
+                                var noteDate = new Date(rss.task.notes[n].created_at).toLocaleString('en-BD', {
                                     day: 'numeric',
                                     month: 'long',
                                     year: 'numeric',
@@ -1224,15 +1269,15 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                 });
                                 note_html += `<div class="note-item">
                                                 <div class="note-meta">
-                                                    <span class="note-author">${(rss.task.notes[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'ইউজার'}</span>
+                                                    <span class="note-author">${(rss.task.notes[n].task_user_id == rss.current_user_id) ? 'Admin' : 'User'}</span>
                                                     <span>${noteDate}</span>
                                                 </div>
-                                                <p>অর্ডারটি দ্রুত ডেলিভারি করার অনুরোধ করেছেন। বিশেষ নির্দেশ: সকালে ডেলিভারি করতে হবে।</p>
+                                                <p>${rss.task.notes[n].task_note_detals}</p>
                                             </div>`;
                             }
 
                             for (let n = 0; n < rss.task.attachments.length; n++) {
-                                var attachDate = new Date(rss.task.attachments[n].created_at).toLocaleString('bn-BD', {
+                                var attachDate = new Date(rss.task.attachments[n].created_at).toLocaleString('en-BD', {
                                     day: 'numeric',
                                     month: 'long',
                                     year: 'numeric',
@@ -1242,7 +1287,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                 note_attatch += `<li class="attachment-item">
                                                 <i class="fas fa-file-pdf"></i>
                                                 <a href="/${rss.task.attachments[n].task_attatch_path}" download target="_blank" >Uploaded File</a>
-                                                <small style="margin-left: auto; color: #aaa;">আপলোড করেছেন: ${(rss.task.attachments[n].task_user_id == rss.current_user_id) ? 'আপনি' : 'ইউজার'} •  ${attachDate}} </small>
+                                                <small style="margin-left: auto; color: #aaa;">Uploded by: ${(rss.task.attachments[n].user_id == rss.current_user_id) ? 'Admin' : 'User'} •  ${attachDate}} </small>
                                             </li>`;
                             }
 
@@ -1252,12 +1297,12 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                         <div class="card">
                                             <div class="card-header">
                                                 <i class="fas fa-sticky-note"></i>
-                                                <h2>কাস্টমার নোটসমূহ</h2>
+                                                <h2>Note Manages</h2>
                                             </div>
                                             <div class="notes-list">${note_html}</div>
                                             <div class="new-note">
-                                                <textarea class="new_note_types " placeholder="নতুন নোট লিখুন..."></textarea>
-                                                <button class="btn btn-success new_note_added_btn " task_id="${task_id}">নোট যোগ করুন</button>
+                                                <textarea class="new_note_types " placeholder="Type note here......"></textarea>
+                                                <button class="btn btn-success new_note_added_btn " task_id="${task_id}">Add Note</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1266,7 +1311,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                         <div class="card">
                                             <div class="card-header">
                                                 <i class="fas fa-paperclip"></i>
-                                                <h2>অ্যাটাচমেন্টস</h2>
+                                                <h2>Attachments Files</h2>
                                             </div>
 
                                             <ul class="attachment-list" style="list-style: none; padding: 0;">
@@ -1275,24 +1320,24 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                                             <div class="upload-area">
                                                 <i class="fas fa-cloud-upload-alt"></i>
-                                                <p class="upload-title">নতুন ফাইল আপলোড করুন</p>
-                                                <p class="upload-hint">একটি ফাইল সিলেক্ট করুন (PDF, JPG, PNG ইত্যাদি)</p>
+                                                <p class="upload-title">Upload New File</p>
+                                                <p class="upload-hint">Select a file (PDF, JPG, PNG etc...)</p>
 
                                                 <!-- প্রিভিউ এরিয়া -->
                                                 <div id="previewArea" class="preview-area" style="display: none;">
                                                     <div id="previewContent"></div>
                                                     <small id="fileInfo"></small>
-                                                    <button id="clearPreview" class="clear-btn">পরিষ্কার করুন</button>
+                                                    <button id="clearPreview" class="clear-btn">Clear</button>
                                                 </div>
 
                                                 <!-- কাস্টম ফাইল ইনপুট -->
                                                 <div class="file-input-wrapper">
                                                     <input type="file" id="fileInput" class="new_file_added" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx" >
                                                     <div class="custom-file-button">
-                                                        ফাইল সিলেক্ট করুন
+                                                        Select file
                                                     </div>
                                                 </div>
-                                                <button class="btn btn-success upload-btn new_file_btn_added " task_id="${task_id}">আপলোড করুন</button>
+                                                <button class="btn btn-success upload-btn new_file_btn_added " task_id="${task_id}">Upload</button>
                                             </div>
 
                                         </div>

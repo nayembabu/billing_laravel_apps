@@ -12,7 +12,8 @@
             'task_attatch_path',
             'task_id',
             'user_id',
-            'created_at'
+            'created_at',
+            'is_read'
         ];
 
             public function task()

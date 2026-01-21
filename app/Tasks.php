@@ -8,7 +8,7 @@
     {
         protected $table = 'tasks';
         protected $fillable =[
-            "user_id", "title", "note", "status", "priority", "start_date", "due_date", "tags", "is_billable", "created_at", "updated_at"
+            "user_id", "title", "note", "status", "priority", "start_date", "due_date", "tags", "is_billable", "created_at", "updated_at", "short_title", "task_desc"
         ];
 
         public function user()

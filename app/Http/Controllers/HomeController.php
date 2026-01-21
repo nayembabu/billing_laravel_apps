@@ -615,9 +615,23 @@ class HomeController extends Controller
 
     public function tasks_view_file()
     {
+        $unreadNotes = TaskNote::where('is_read', 0)->get();
+        $unreadAttachments = TaskAttach::where('is_read', 0)->get();
         $tasks = Tasks::with('user')->where('activity', 1)->get();
         $users = User::where('is_active', 1)->get();
-        return view('tasks.index', compact('tasks', 'users'));
+        return view('tasks.index', compact('tasks', 'users', 'unreadNotes', 'unreadAttachments'));
+    }
+
+    public function markAttachRead($id)
+    {
+        TaskAttach::where('id', $id)->update(['is_read' => 1]);
+        return back();
+    }
+
+    public function markNoteRead($id)
+    {
+        TaskNote::where('id', $id)->update(['is_read' => 1]);
+        return back();
     }
 
     public function tasks_view_fileget_tasks_data_api()
