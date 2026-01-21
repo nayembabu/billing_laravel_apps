@@ -624,6 +624,7 @@ class HomeController extends Controller
     {
         $data['tasks'] = Tasks::with('user')
                             ->where('activity', 1)
+                            ->orderBy('id', 'desc')
                             ->when(Auth::user()->role_id != 1, function ($q) {
                                 $q->where('user_id', Auth::id());
                             })
@@ -633,38 +634,19 @@ class HomeController extends Controller
 
     public function task_store_entry(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title'       => 'required|string|max:250',
-            'start_date'  => 'required|date',
-            'end_date'    => 'required|date|after_or_equal:start_date',
-            'user_id'     => 'required|integer',
-            'priority'    => 'required',
-            'status'      => 'required',
-            'tag'         => 'nullable|string|max:200',
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'status'  => 0,
-                'errors'  => $validator->errors()
-            ], 422);
-        }
-
         $task = Tasks::create([
             'title'       => $request->title,
+            'task_desc'   => $request->description,
             'short_title' => $request->short,
             'note'        => $request->note,
-            'start_date'  => date('Y-m-d', strtotime($request->start_date)),
-            'due_date'    => date('Y-m-d', strtotime($request->end_date)),
             'user_id'     => $request->user_id,
             'priority'    => $request->priority,
             'status'      => $request->status,
             'tags'        => $request->tag,
-            'description' => $request->description,
+            'start_date'  => date('Y-m-d', strtotime($request->start_date)),
+            'due_date'    => date('Y-m-d', strtotime($request->end_date)),
+            'activity'    => 1,
         ]);
-
         return response()->json([
             'message' => 'Task created successfully',
             'status'  => 1,

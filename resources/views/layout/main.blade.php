@@ -303,12 +303,14 @@
             </li>
             @endif
 
-            <li><a href="#crm-list" aria-expanded="false" data-toggle="collapse" class=""> <i class="dripicons-network-3"></i><span>CRM</span></a>
-                <ul id="crm-list" class="list-unstyled collapse {{ Route::currentRouteName() == 'crm.index' ? 'show' : '' }}" style="">
-                    <li id="exp-cat-menu" class="{{ Route::currentRouteName() == 'crm.index' ? 'active' : '' }}"><a href="{{ route('crm.index') }}">Send SMS</a>
-                    </li>
-                </ul>
-            </li>
+            @if(Auth::user()->role_id == 1)
+                <li><a href="#crm-list" aria-expanded="false" data-toggle="collapse" class=""> <i class="dripicons-network-3"></i><span>CRM</span></a>
+                    <ul id="crm-list" class="list-unstyled collapse {{ Route::currentRouteName() == 'crm.index' ? 'show' : '' }}" style="">
+                        <li id="exp-cat-menu" class="{{ Route::currentRouteName() == 'crm.index' ? 'active' : '' }}"><a href="{{ route('crm.index') }}">Send SMS</a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
 
             <?php
             $index_permission_active = DB::table('permissions')

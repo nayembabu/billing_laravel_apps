@@ -743,7 +743,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                     <span class="text-danger">*</span>
                                     Subject
                                 </label>
-                                <input type="text" class="form-control form-control-sm border-primary tasks_title " style="border-width: 1.5px;">
+                                <input type="text" class="form-control form-control-sm border-primary tasks_title " style="border-width: 1.5px;" value="" >
                             </div>
 
                             <div class="row">
@@ -753,7 +753,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                             <span class="text-danger">*</span>
                                             Short Details
                                         </label>
-                                        <input type="text" class="form-control form-control-sm border-primary short_details " style="border-width: 1.5px;">
+                                        <input type="text" class="form-control form-control-sm border-primary short_details " style="border-width: 1.5px;" value="" >
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -762,7 +762,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                             <span class="text-danger">*</span>
                                             Note
                                         </label>
-                                        <input type="text" class="form-control form-control-sm border-primary tasks_notes " style="border-width: 1.5px;">
+                                        <input type="text" class="form-control form-control-sm border-primary tasks_notes " style="border-width: 1.5px;" value="" >
                                     </div>
                                 </div>
                             </div>
@@ -775,7 +775,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                             Start Date
                                         </label>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control date start_datess" value="{{date('d-m-Y')}}">
+                                            <input type="text" class="form-control date start_datess" value="{{date('d-m-Y')}}" value="" >
                                             <div class="input-group-append">
                                                 <span class="input-group-text">
                                                     <i class="far fa-calendar-alt"></i>
@@ -788,7 +788,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                     <div class="form-group">
                                         <label class="font-weight-bold small text-muted">Due Date</label>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control date end_datess" value="{{date('d-m-Y')}}">
+                                            <input type="text" class="form-control date end_datess" value="{{date('d-m-Y')}}" value="" >
                                             <div class="input-group-append">
                                                 <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                             </div>
@@ -841,9 +841,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                     <div class="form-group">
                                         <label class="font-weight-bold small text-muted"><i class="fas fa-tag mr-1"></i>
                                             Tags</label>
-                                        <input type="text" class="form-control form-control-sm tag_type_here "
-                                            placeholder="Tag"
-                                            style="border-top:none; border-left:none; border-right:none; border-radius:0;">
+                                        <input type="text" class="form-control form-control-sm tag_type_here " placeholder="Tag" style="border-top:none; border-left:none; border-right:none; border-radius:0;" value="" >
                                     </div>
                                 </div>
                             </div>
@@ -852,14 +850,12 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                             <div class="form-group">
                                 <label class="font-weight-bold small text-muted">Task Description</label>
-                                <textarea class="form-control task_description_typings " rows="4"
-                                    placeholder="Add Description"></textarea>
+                                <textarea class="form-control task_description_typings " rows="4" placeholder="Add Description"></textarea>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary btn-sm"
-                            data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-dark btn-sm px-3 entry_new_task_btn ">Save</button>
                     </div>
                 </div>
@@ -1291,7 +1287,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
 
                                                 <!-- কাস্টম ফাইল ইনপুট -->
                                                 <div class="file-input-wrapper">
-                                                    <input type="file" id="fileInput" class="new_file_added" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx">
+                                                    <input type="file" id="fileInput" class="new_file_added" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx" >
                                                     <div class="custom-file-button">
                                                         ফাইল সিলেক্ট করুন
                                                     </div>
@@ -1518,7 +1514,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label class="small font-weight-bold">Tags</label>
-                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tag || ''}">
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tags || ''}">
                                                 </div>
                                             </div>
                                             <div class="formRow2">
@@ -2267,7 +2263,7 @@ $color_rgba = 'rgba(52, 73, 94, 0.8)';
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label class="small font-weight-bold">Tags</label>
-                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tag || ''}">
+                                                    <input type="text" class="form-control form-control-sm niceInput edit_tags" placeholder="e.g. bug, ui, urgent" value="${rss.task.tags || ''}">
                                                 </div>
                                             </div>
                                             <div class="formRow2">
